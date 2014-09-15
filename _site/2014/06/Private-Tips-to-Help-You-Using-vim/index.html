@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="likunran" />
+    <meta name="viewport" content="width=device-width"> 
+    <title>提升使用VIM幸福感的几招 | likunran</title>
+	<!-- Jim disable
+	script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?autoload=true&skin=Desert"></script-->
+    <link href="/feed/" rel="alternate" title="likunran" type="application/atom+xml" />
+
+    <link rel="stylesheet" href="/media/css/highlight.css">
+    <link href='/media/webfonts/ss-social.css' rel='stylesheet'>
+    <link href='/media/webfonts/ss-standard.css' rel='stylesheet'>
+
+    <script language="JavaScript"><!--
+        if (navigator.userAgent.match(/iPhone|iPod|Android|IEMobile/i)) {
+            document.write("<link href=\"/media/css/screen-mobil.css\" rel=\"stylesheet\">");
+        } else {
+            document.write("<link href=\"/media/css/screen.css\" rel=\"stylesheet\">");
+        }
+        // -->
+    </script>
+
+    <!--script type="text/javascript" src="/media/js/jquery-1.7.1.min.js"></script-->
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.2.min.js"></script>
+	
+  </head>
+  <body>
+    <div id="container">
+      <div id="main" role="main">
+        <header>
+        <div class="buttons">
+          <a href="/" class="ss-icon" title="Go to homepage">home</a>
+          <a href="/categories" class="ss-icon" title="Category" >list</a>
+          <a href="/tags" class="ss-icon" title="Tag Cloud" >tags</a>
+          <a href="/guestbook" class="ss-icon" title="Guest Book" >talk</a>
+          <a href="/about" class="ss-icon" title="About" >user</a>
+          <a href="/feed" class="ss-icon" title="Subscribe by RSS" >rss</a>
+        </div>
+        <h1>提升使用VIM幸福感的几招</h1>
+        </header>
+        <hr>
+        <article class="content">
+        <section class="post">
+<h2>引言</h2>
+
+<blockquote><p>很多时候使用Vim的痛点在于有些操作总是不方便，不能流畅使用，本文是作者解决自己痛点时积累下来的，应该对其他人同样有用。
+学习VIM的诀窍就是在用中学，所以您在看本文的时候最好打开VIM顺便实践一下。
+由于本人需要同时使用众多的SERVER，不可能到处装插件，所以本文中所有的技巧都是VIM中自带的，不涉及插件。</p></blockquote>
+
+<hr />
+
+<h2>第一招，文件浏览类</h2>
+
+<pre><code>:pwd
+:cd
+:e .
+:Sex
+:bro ol
+</code></pre>
+
+<p>大多数VIM教程关注的都是文本编辑本身，所以如何方便的打开文件就被忽略了。
+首先要明白VIM中有当前文件夹（CWD）的概念，默认是你打开VIM时所在的文件夹。你可以用与Linux一样的<code>:pwd</code>查看，
+接下来你可以<code>:cd</code>到其他文件夹，再接下来就可以用<code>:e . (:edit .)</code>来浏览当前目录，vim会在一个新window中打开目录，你还可以进行查看父目录，排序等各种操作。这里顺便提一下用vim也可以打开各种压缩文件来查看目录结构。</p>
+
+<p>上面的方式可以让你切换目录并打开文件。由于vim支持通过多窗口和多Tab同时编辑多个文件，假如你要不停的修改两个目录下的不同文件，那么用上面的方式不停的切换当前目录也是不方便的，是时候就轮到<code>:Sex</code>(或者:Sex!)了，它直接在新window中打开当前文件（而不是CWD）所在的目录，这样可你让你方便的浏览不同的目录。</p>
+
+<p>同样是浏览目录，如果你用的是GUI版的vim，比如Windows版的GVIM，这时可以用<code>:bro e</code> （:browse explore）指令打开操作系统如Windows的文件浏览器。</p>
+
+<p>最后一个快速打开文件的方法就是从编辑过的文件历史中选择，指令<code>:bro ol</code>（:browse old）可以打开编辑历史供你选择要打开的文件。</p>
+
+<p>上面<code>:Sex</code>方式打开的文件是在一个Window里，如果你想在一个单独的Tab里编辑文件又该怎么办呢？<code>ctrol + w T</code>可以将当前的Window移动到一个新的Tab里。</p>
+
+<h2>第二招，查看历史类</h2>
+
+<p>使用vim时需要键入不少的指令，有些还相当的复杂，比如查找替换时用的正则表达式，上面提到过的历史编辑文件等。复用那些之前的指令可以大幅提升效率，各类常用查看历史的指令罗列如下：</p>
+
+<pre><code>q/            查看搜索历史
+q:            查看和执行历史指令，不可修改
+:+up/down     查看指令历史，可修改       
+:reg          查看剪贴板和宏历史
+:marks        查看所有mark过的位置
+</code></pre>
+
+<h2>第三招，另类搜索</h2>
+
+<p>当一个patten的match太多的时候，用n在match中跳跃也比较费眼，这种情况我一般用<code>:vimgrep</code>，它可以把所有匹配显示在一个quickhelp窗口，然后你可以用<code>:cn</code> <code>:cp</code>等在结果中跳跃（也可用鼠标）。如果如果不需要跳转的话可以简单的键入<code>:g /patten</code>也会新开一个窗口并列出所有匹配。</p>
+
+<pre><code>
+:vimgrep patten %   %指当前文件名
+:copen 
+:cn
+:cp
+:g /pattern
+</code></pre>
+
+<h2>其它提升幸福感的方法</h2>
+
+<ol>
+<li>使用<code>Ctrl+c</code>替代<code>ESC</code>。这是因为在Vi发明的时代ESC其实是在CapsLK的位置的，习惯<code>Ctrl+c</code>后会发现更幸福。</li>
+<li>安装中文帮助文档，提升阅读文档的幸福感。</li>
+<li>学习使用Shift键，比如<code>H</code> <code>J</code> <code>K</code> <code>L</code> <code>M</code> <code>I</code> <code>A</code> <code>O</code>等提升操作的流畅性。</li>
+</ol>
+
+
+<hr />
+
+<blockquote><p>觉得本文还过得去的话，别忘了回到主页顺便看看作者的其它原创文章哟？</p></blockquote>
+
+</section>
+<section class="meta">
+<hr/>
+<span class="author">
+  <a href="http://blog.sevenche.com">likunran</a> - 程序员，7年工作经验集中在Java, Android, C++，现就职于上海Avaya Emerging Product and Technology部门。
+</span>
+<br />
+<span class="license">
+  Published under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">(CC) BY-NC-SA</a>
+</span>
+
+<span class="categories">
+  in categories
+  
+  <a href="/categories/#common tec" title="common tec">common tec</a>&nbsp;
+  
+</span>
+
+
+<span class="tags">
+  tagged with 
+  
+  <a href="/tags/#vim" title="vim">vim</a>&nbsp;
+  
+</span>
+
+<span class="time">
+  <br/>
+  <time datetime="2014-06-10">2014-06-10</time>
+</span>
+</section>
+<section class="comment">
+<!-- baidu JIA -->
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+<!-- end of baidu JIA -->
+
+<!-- Duoshuo Comment BEGIN -->
+	<div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"likunran"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = 'http://static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		|| document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- Duoshuo Comment END -->
+</section>
+
+
+<script type="text/javascript">
+$(function(){
+  $(document).keydown(function(e) {
+    var url = false;
+        if (e.which == 37 || e.which == 74) {  // Left arrow and J
+            
+        url = 'http://www.uyicu.com/2014/05/HongLouMeng-vim/';
+        
+        }
+        else if (e.which == 39 || e.which == 75) {  // Right arrow and K
+            
+        }
+        if (url) {
+            window.location = url;
+        }
+  });
+})
+
+</script>
+
+<style type="text/css">
+/*resize the big pic*/
+div.resized_image p {
+  margin: 2px;
+  margin-top: 0;
+  font-size: 8px;
+  /* Awesome icon from here: http://www.famfamfam.com/lab/icons/silk/ */
+  background: url(http://i242.photobucket.com/albums/ff244/9861_omikron/error.png) no-repeat;
+  padding-left: 20px;
+  color: #333;
+}
+</style>
+<script type="text/javascript">
+//resize the big pic
+$(window).load(function() {
+  (
+    function(maxht, maxwt, minht, minwt) {
+      var imgs = document.getElementsByTagName('img');
+      // Image resizing function
+      var resize_image = function(img, newht, newwt) {
+        img.height = newht;
+        img.width  = newwt;
+        $(img).wrap('<table><tr><td class="tborder"><div class="resized_image"><a href="' + img.src + '" target="_blank"></a></div></td></tr></table>');
+        $(img).parent().before('<p>NOTE: This image was resized. To view it full-size, click on the image.</p>');
+        //$(img).parent().after('<p style="text-align:right;background:none;margin:0;padding-right:3px">Image resizing script by <a href="http://aetus.net/217/programming/automatically-resize-large-images-with-javascript/">Aetus Designs</a>.</p>');
+      };
+      
+      for (var i = 0; i < imgs.length; i++) {
+        // Set a variable for the current image to make the code make more sense.
+        var img = imgs[i];
+        if (img.height > maxht || img.width > maxwt) {
+          // Use Ratios to constraint proportions.
+          var old_ratio = img.height / img.width;
+          var min_ratio = minht / minwt;
+          // If it can scale perfectly.
+          if (old_ratio === min_ratio) {
+            resize_image(img, minht, minwt);
+          } 
+          // We need to do some magic now.
+          else {
+            var newdim = [img.height, img.width];
+            // Sort out the height first.
+            newdim[0] = minht;
+            // The logic behind this is that if ratio = ht / wt, then wt = ht / ratio.
+            newdim[1] = newdim[0] / old_ratio;
+            // Do we still have to sort out the width?
+            if (newdim[1] > maxwt) {
+              // Just do what we did with the height
+              newdim[1] = minwt;
+              newdim[0] = newdim[1] * old_ratio;
+            }
+            // So yeah, resize the image
+            resize_image(img, newdim[0], newdim[1]);
+          }
+        }
+      }
+    }
+  )(780, 780, 780, 780);
+});
+</script>
+        </article>
+      </div>
+
+    <footer>
+        <p><small>Powered by <a href="https://github.com/mojombo/jekyll">Jekyll</a> | Free hosted at <a href="https://github.com/dashjim">Github</a> | Copyright 2014 - 2014 by 
+		<!-- *** Please Keep bellow link for at least 6 months! Thanks！*** -->
+		<a href="http://blog.sevenche.com/about/">Template Maintained by Jim</a>
+		
+		| <span class="label label-info">2014-09-15 10:06:31 CST</span></small></p>
+    </footer>
+
+    </div>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', '', 'uyicu.com');
+  ga('send', 'pageview');
+
+</script>
+  </body>
+</html>

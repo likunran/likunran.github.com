@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="likunran" />
+    <meta name="viewport" content="width=device-width"> 
+    <title>基于TCP和无线网络（3G）的实时应用需要注意的问题 | likunran</title>
+	<!-- Jim disable
+	script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?autoload=true&skin=Desert"></script-->
+    <link href="/feed/" rel="alternate" title="likunran" type="application/atom+xml" />
+
+    <link rel="stylesheet" href="/media/css/highlight.css">
+    <link href='/media/webfonts/ss-social.css' rel='stylesheet'>
+    <link href='/media/webfonts/ss-standard.css' rel='stylesheet'>
+
+    <script language="JavaScript"><!--
+        if (navigator.userAgent.match(/iPhone|iPod|Android|IEMobile/i)) {
+            document.write("<link href=\"/media/css/screen-mobil.css\" rel=\"stylesheet\">");
+        } else {
+            document.write("<link href=\"/media/css/screen.css\" rel=\"stylesheet\">");
+        }
+        // -->
+    </script>
+
+    <!--script type="text/javascript" src="/media/js/jquery-1.7.1.min.js"></script-->
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.2.min.js"></script>
+	
+  </head>
+  <body>
+    <div id="container">
+      <div id="main" role="main">
+        <header>
+        <div class="buttons">
+          <a href="/" class="ss-icon" title="Go to homepage">home</a>
+          <a href="/categories" class="ss-icon" title="Category" >list</a>
+          <a href="/tags" class="ss-icon" title="Tag Cloud" >tags</a>
+          <a href="/guestbook" class="ss-icon" title="Guest Book" >talk</a>
+          <a href="/about" class="ss-icon" title="About" >user</a>
+          <a href="/feed" class="ss-icon" title="Subscribe by RSS" >rss</a>
+        </div>
+        <h1>基于TCP和无线网络（3G）的实时应用需要注意的问题</h1>
+        </header>
+        <hr>
+        <article class="content">
+        <section class="post">
+<p>最近工作中把一个实时的基于Adobe Air的实时视频聊天程序porting到Android上。原本PC版本测试时视频的质量很好，但是转到Android上后在3G网络上测试发现视频质量比较差。由于Air程序与服务器是通过RTMP这一基于TCP的协议来沟通的，在解决问题的过程中有一些关于TCP的小小发现。</p>
+
+<hr />
+
+<h2>3G下测试出的情况</h2>
+
+<p>在3G网络下测试的时候我先在设备上运行了一个网速测试的APP，得出当时的网速是上行4.5M下行1.6M左右，对WCDMA来说这是一个比较好的数字，而我们的服务器设置中视频质量仅需要320K的带宽就够了。然而实际通话时的视频和音频质量都非常差（最后双方关上视频，仅用音频的质量都比较差）。</p>
+
+<h2>服务器上抓包</h2>
+
+<blockquote><p><strong>NOTE:</strong>
+需要注意抓包的准确性问题。在服务器上如果用tcpdump抓包，特别是像视频实时应用的时候由于数据量大，tcpdump依赖的底层库可能会来不及处理而buffer溢出，使得数据文件不完整。这样在用wireshark分析的时候会看到的丢包量就是不准确的。
+<img src="/media/pic2014/0201-2.png" alt="" />
+解决方法参考<a href="http://wenku.baidu.com/view/74b3166e1eb91a37f1115cf6.html">tcpdump抓包丢失问题</a>。</p></blockquote>
+
+<p>在分析抓到的包时我们看到大量的丢包，如下图：
+<img src="/media/pic2014/0201-1.png" alt="" /></p>
+
+<h3>更多测试的结果</h3>
+
+<p>下面的对比测试中我们对比一下不同丢包情况所导致的不同TCP吞吐率曲线。（前面一个小峰是带宽测试留下的。）</p>
+
+<p>下图是视频质量好的时候的TCP呑吐率情况
+<img src="/media/pic2014/0201-4.png" alt="" />
+下图是视频时断时续丟包
+<img src="/media/pic2014/0201-5.png" alt="" />
+下图是视频几乎无法进行的情况
+<img src="/media/pic2014/0201-6.png" alt="" /></p>
+
+<p>由上面的图形我们看到不同的丢包对TCP传输率产生了不同的影响。</p>
+
+<h2>3G带宽与TCP丢包</h2>
+
+<p>这轮测试下来得出的重要结论是<strong>TCP在WCDMA3G下的网速远达不到其宣称值</strong>！因为丢包会导致TCP误以为是网络拥塞，而双方减小收发窗口，主动降速。
+下图就是我实测的TCP网速。
+<img src="/media/pic2014/0201-3.png" alt="" />
+再来看一下维基是怎么说这个问题的：</p>
+
+<blockquote><p><a href="http://en.wikipedia.org/wiki/Transmission_Control_Protocol#TCP_over_wireless_networks">TCP_over_wireless_networks</a></p>
+
+<p>TCP has been optimized for wired networks. Any packet loss is considered to be the result of network congestion and the congestion window size is reduced dramatically as a precaution. However, wireless links are known to experience sporadic and usually temporary losses due to fading, shadowing, hand off, and other radio effects, that cannot be considered congestion. After the (erroneous) back-off of the congestion window size, due to wireless packet loss, there can be a congestion avoidance phase with a conservative decrease in window size. This causes the radio link to be underutilized. Extensive research has been done on the subject of how to combat these harmful effects. Suggested solutions can be categorized as end-to-end solutions (which require modifications at the client or server),[38] link layer solutions (such as RLP in cellular networks), or proxy based solutions (which require some changes in the network without modifying end nodes).</p>
+
+<p><a href="http://en.wikipedia.org/wiki/3g">参考3G的标称网速</a></p>
+
+<p>HSPA is an amalgamation of several upgrades to the original W-CDMA standard and offers speeds of <strong>14.4 Mbit/s</strong> down and <strong>5.76 MBit/s</strong> up. HSPA is backwards compatible with and uses the same frequencies as W-CDMA.</p></blockquote>
+
+<p>注意标称网速不包括自身的信令消耗，所以150M的WiFi实际数据传输速度超不过80兆。3G消耗的信令可能更多。</p>
+
+<h2>如何改进</h2>
+
+<p><strong>带宽检测</strong></p>
+
+<p>大多数实时通信程序都会在链接建立前发几个包测试带宽，这种做法在传统网络问题不大（会部分受到tcp slow start的影响）。但是在3G下，这几个包如果不丢，测出的速度会过高，如果有丢包，则测出的速度会过低。</p>
+
+<p>所以在3G下的应用必须在链接建立后实时监测通信质量，如果发现延迟增加等情况要实时降低视频分辨率以保证流畅。</p>
+
+<p>另一种简单办法是延长一开始的带宽测试时间。比如说测十秒。我曾在与Skype的对比测试中发现从拨号到对方实际振铃有较长延迟，这中间有可能就是在测带宽。</p>
+
+<p><strong>UDP</strong></p>
+
+<p>使用基于UDP的传输协议可以从根本上解决以上问题。</p>
+
+</section>
+<section class="meta">
+<hr/>
+<span class="author">
+  <a href="http://blog.sevenche.com">likunran</a> - 程序员，7年工作经验集中在Java, Android, C++，现就职于上海Avaya Emerging Product and Technology部门。
+</span>
+<br />
+<span class="license">
+  Published under <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">(CC) BY-NC-SA</a>
+</span>
+
+<span class="categories">
+  in categories
+  
+  <a href="/categories/#telecom" title="telecom">telecom</a>&nbsp;
+  
+</span>
+
+
+<span class="tags">
+  tagged with 
+  
+  <a href="/tags/#Flex, Adobe AIR, Video, TCP" title="Flex, Adobe AIR, Video, TCP">Flex, Adobe AIR, Video, TCP</a>&nbsp;
+  
+</span>
+
+<span class="time">
+  <br/>
+  <time datetime="2014-02-01">2014-02-01</time>
+</span>
+</section>
+<section class="comment">
+<!-- baidu JIA -->
+<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+<!-- end of baidu JIA -->
+
+<!-- Duoshuo Comment BEGIN -->
+	<div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"likunran"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = 'http://static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		|| document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- Duoshuo Comment END -->
+</section>
+
+
+<script type="text/javascript">
+$(function(){
+  $(document).keydown(function(e) {
+    var url = false;
+        if (e.which == 37 || e.which == 74) {  // Left arrow and J
+            
+        url = 'http://www.uyicu.com/2014/01/Set-up/';
+        
+        }
+        else if (e.which == 39 || e.which == 75) {  // Right arrow and K
+            
+        url = 'http://www.uyicu.com/2014/02/Git-cook-book/';
+        
+        }
+        if (url) {
+            window.location = url;
+        }
+  });
+})
+
+</script>
+
+<style type="text/css">
+/*resize the big pic*/
+div.resized_image p {
+  margin: 2px;
+  margin-top: 0;
+  font-size: 8px;
+  /* Awesome icon from here: http://www.famfamfam.com/lab/icons/silk/ */
+  background: url(http://i242.photobucket.com/albums/ff244/9861_omikron/error.png) no-repeat;
+  padding-left: 20px;
+  color: #333;
+}
+</style>
+<script type="text/javascript">
+//resize the big pic
+$(window).load(function() {
+  (
+    function(maxht, maxwt, minht, minwt) {
+      var imgs = document.getElementsByTagName('img');
+      // Image resizing function
+      var resize_image = function(img, newht, newwt) {
+        img.height = newht;
+        img.width  = newwt;
+        $(img).wrap('<table><tr><td class="tborder"><div class="resized_image"><a href="' + img.src + '" target="_blank"></a></div></td></tr></table>');
+        $(img).parent().before('<p>NOTE: This image was resized. To view it full-size, click on the image.</p>');
+        //$(img).parent().after('<p style="text-align:right;background:none;margin:0;padding-right:3px">Image resizing script by <a href="http://aetus.net/217/programming/automatically-resize-large-images-with-javascript/">Aetus Designs</a>.</p>');
+      };
+      
+      for (var i = 0; i < imgs.length; i++) {
+        // Set a variable for the current image to make the code make more sense.
+        var img = imgs[i];
+        if (img.height > maxht || img.width > maxwt) {
+          // Use Ratios to constraint proportions.
+          var old_ratio = img.height / img.width;
+          var min_ratio = minht / minwt;
+          // If it can scale perfectly.
+          if (old_ratio === min_ratio) {
+            resize_image(img, minht, minwt);
+          } 
+          // We need to do some magic now.
+          else {
+            var newdim = [img.height, img.width];
+            // Sort out the height first.
+            newdim[0] = minht;
+            // The logic behind this is that if ratio = ht / wt, then wt = ht / ratio.
+            newdim[1] = newdim[0] / old_ratio;
+            // Do we still have to sort out the width?
+            if (newdim[1] > maxwt) {
+              // Just do what we did with the height
+              newdim[1] = minwt;
+              newdim[0] = newdim[1] * old_ratio;
+            }
+            // So yeah, resize the image
+            resize_image(img, newdim[0], newdim[1]);
+          }
+        }
+      }
+    }
+  )(780, 780, 780, 780);
+});
+</script>
+        </article>
+      </div>
+
+    <footer>
+        <p><small>Powered by <a href="https://github.com/mojombo/jekyll">Jekyll</a> | Free hosted at <a href="https://github.com/dashjim">Github</a> | Copyright 2014 - 2014 by 
+		<!-- *** Please Keep bellow link for at least 6 months! Thanks！*** -->
+		<a href="http://blog.sevenche.com/about/">Template Maintained by Jim</a>
+		
+		| <span class="label label-info">2014-09-15 10:06:31 CST</span></small></p>
+    </footer>
+
+    </div>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', '', 'uyicu.com');
+  ga('send', 'pageview');
+
+</script>
+  </body>
+</html>
