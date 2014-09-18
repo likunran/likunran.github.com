@@ -1,6 +1,0 @@
-markdown: rdiscount
-permalink: /:year/:month/:title/
-url: http://www.uyicu.com
-author: likunran
-pygments: true
-paginate: 24
