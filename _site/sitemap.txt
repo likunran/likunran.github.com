@@ -1,0 +1,15 @@
+
+/archive.html
+
+/atom.xml
+
+/category.html
+
+/index.html
+
+/sitemap.txt
+
+
+
+/2014/09/18/how-to-step-storm-on-centos.html
+

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+ <title></title>
+ <link href="/atom.xml" rel="self"/>
+ <link href=""/>
+ <updated>2014-09-19T00:01:26+08:00</updated>
+ <id></id>
+ <author>
+   <name></name>
+   <email></email>
+ </author>
+
+ 
+ <entry>
+   <title>Centos 下 storm 单机部署</title>
+   <link href="/2014/09/18/how-to-step-storm-on-centos.html"/>
+   <updated>2014-09-18T00:00:00+08:00</updated>
+   <id>h/2014/09/18/how-to-step-storm-on-centos</id>
+   <content type="html">&lt;h1&gt;Centos 下 storm 单机部署&lt;/h1&gt;
+
+&lt;p&gt;从去年做广告效果统计接触storm开始。开始了解了storm 也有一段时间了。这段时间想在自己机器上部署个storm 但是发现网上没有太好点教程就决定自己写一篇单机部署。&lt;/p&gt;
+
+&lt;p&gt;机子上的基本环境：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;parallels 虚拟机&lt;/li&gt;
+&lt;li&gt;centos&lt;/li&gt;
+&lt;li&gt;python 2.6&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h2&gt;jdk 替换&lt;/h2&gt;
+
+&lt;p&gt;  1.首先卸载centos自带openjdk.
+  2.官网下载jdk .
+  3.配置环境变量 &lt;code&gt;vi /etc/profile&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;You are missing a library required for Markdown. Please run:ls
+export JAVA_HOME=/export/home/server/jdk1.6.0_25
+export CLASSPATH=$JAVA_HOME/jre/lib:$JAVA_HOME/lib
+export PATH=$PATH:$JAVA_HOME/bin&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;运行 java：&lt;code&gt;java -version&lt;/code&gt;，提示：&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;You are missing a library required for Markdown. Please run:
+java version &amp;quot;1.6.0_65&amp;quot;
+Java(TM) SE Runtime Environment (build 1.6.0_65-b14-462-11M4609)
+Java HotSpot(TM) 64-Bit Server VM (build 20.65-b04-462, mixed mode)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;python 安装&lt;/h2&gt;
+
+&lt;p&gt;运行 ｀python -v｀ 命令查看python 版本&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;# installing zipimport hook
+import zipimport # builtin
+# installed zipimport hook
+# /usr/lib64/python2.6/site.pyc matches /usr/lib64/python2.6/site.py&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;python 2.6 版本已经存在无需安装&lt;/p&gt;
+
+&lt;h2&gt;ZooKeeper 安装&lt;/h2&gt;
+
+&lt;p&gt;   1.官网下载zookeeper&lt;/p&gt;
+
+&lt;p&gt;   修改配置文件如下&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;tickTime=2000
+dataDir=/home/hadoop/storage/zookeeper
+clientPort=2181
+initLimit=5
+syncLimit=2&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;具体的配置项的解释大家可以自己去查&lt;/p&gt;
+
+&lt;h2&gt;ZeroMQ 安装&lt;/h2&gt;
+
+&lt;p&gt;从 http://download.zeromq.org/zeromq-2.1.7.tar.gz 下载&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;tar zxf zeromq-2.1.7.tar.gz
+cd zeromq-2.1.7
+./configure
+make
+make install
+sudo ldconfig&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;jzmq 安装&lt;/h2&gt;
+
+&lt;p&gt;从http://github.com/nathanmarz/jzmq页面下载jzmq-master.zip&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;unzip -zxvf jzmq-master.zip
+cd jzmq
+./autogen.sh
+./configure
+make
+make install&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Strom 安装&lt;/h2&gt;
+
+&lt;p&gt; 我下载的是 0.9.0.1 这个版本可以选择是 jzmq或netty
+ 修改配置文件如下&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;storm.zookeeper.servers:
+     - &amp;quot;localhost&amp;quot;
+
+storm.zookeeper.port: 2181
+storm.local.dir: /export/data/storm/tmp
+nimbus.host: &amp;quot;localhost&amp;quot;
+supervisor.slots.ports:
+    - 6700
+    - 6701
+    - 6702
+    - 6703&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;由于我现在是单机部署 所以配置loccalhost  zookeeper.port 配置 刚才　zk 端口 2181&lt;/p&gt;
+
+&lt;p&gt;启动 strom&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;storm nimbus&amp;amp;
+storm supervisor&amp;amp;
+storm ui&amp;amp;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;查看日志
+｀tail -f ui.log｀&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;2014-09-18 22:09:40 o.m.log [INFO] Logging to Logger[org.mortbay.log] via org.mortbay.log.Slf4jLog
+2014-09-18 22:09:40 o.m.log [INFO] Started SocketConnector@0.0.0.0:8080&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;访问strom ui&lt;/p&gt;
+
+&lt;p&gt;http://10.37.129.3:8080/
+图如下
+&lt;img src=&quot;/css/images/sui.png&quot; alt=&quot;Alt text&quot; height=&quot;300&quot;&gt;&lt;/p&gt;
+
+&lt;h1&gt;总结&lt;/h1&gt;
+
+&lt;p&gt;在安装过程中 zeromq 刚开始报错很多。根据提示一步步装其他软件就可以搞定。在外部访问虚拟机strom ui时 记得把端口打开&lt;/p&gt;
+</content>
+ </entry>
+ 
+ 
+</feed>
