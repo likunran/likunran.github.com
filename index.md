@@ -1,6 +1,6 @@
 ---
 layout: index 
-title: Hanhao bird...
+title: Kunran Li...
 ---
 
 {% for post in site.posts %}
