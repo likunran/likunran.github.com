@@ -11,5 +11,7 @@
 
 
 
+/2014/09/23/how-to-deploy-strom-master.html
+
 /2014/09/18/how-to-step-storm-on-centos.html
 

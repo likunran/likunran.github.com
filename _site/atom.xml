@@ -4,13 +4,108 @@
  <title></title>
  <link href="/atom.xml" rel="self"/>
  <link href=""/>
- <updated>2014-09-23T21:14:05+08:00</updated>
+ <updated>2014-09-24T00:10:15+08:00</updated>
  <id></id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>storm提交程序</title>
+   <link href="/2014/09/23/how-to-deploy-strom-master.html"/>
+   <updated>2014-09-23T00:00:00+08:00</updated>
+   <id>h/2014/09/23/how-to-deploy-strom-master</id>
+   <content type="html">&lt;h1&gt;storm提交程序&lt;/h1&gt;
+
+&lt;p&gt;storm 已经部署完成准备写个例子测试下storm安装是否成功。当然选择了经典的代码storm-starter-master&lt;/p&gt;
+
+&lt;p&gt;开发环境：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;idea&lt;/li&gt;
+&lt;li&gt;jdk 1.6&lt;/li&gt;
+&lt;li&gt;maven&lt;/li&gt;
+&lt;li&gt;git&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h2&gt;下载 strom-starter-master&lt;/h2&gt;
+
+&lt;p&gt;运行 &lt;code&gt;git clone https://github.com/nathanmarz/storm-starter.git&lt;/code&gt;，提示：&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;localhost:log likunran$ git clone https://github.com/nathanmarz/storm-starter.gi
+Cloning into &amp;#39;storm-starter.gi&amp;#39;...
+remote: Repository not found.
+fatal: repository &amp;#39;https://github.com/nathanmarz/storm-starter.gi/&amp;#39; not found
+localhost:log likunran$ git clone https://github.com/nathanmarz/storm-starter.git
+Cloning into &amp;#39;storm-starter&amp;#39;...
+remote: Counting objects: 756, done.
+remote: Total 756 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (756/756), 171.81 KiB | 117.00 KiB/s, done.
+Resolving deltas: 100% (274/274), done.
+Checking connectivity... done.&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;maven 安装&lt;/h2&gt;
+
+&lt;p&gt;运行 ｀maven&#39; 命令查看 maven是否安装&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;localhost:log likunran$ maven
+-bash: maven: command not found&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;maven 没有安装，下载maven 配置环境变量&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;./etc/profile 文件   全局共有配置，无论哪个用户登录，都会读取此&gt; 文件
+/etc/bashrc    （一般在这个文件中添加系统级环境变量）全局（公有）配置，bash shell执行时，不管是何种方式，都会读取此文件。
+~/.bash_profile  （一般在这个文件中添加用户级环境变量）&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;添加环境变量&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;MAVEN_HOME=/Users/likunran/tools/apache-maven-2.2.1
+PATH=$MAVEN_HOME/bin:$PATH
+export MAVEN_HOME
+export PATH&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt; &lt;code&gt;source .bash_profile&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2&gt;项目编译&lt;/h2&gt;
+
+&lt;p&gt;   1.进入到storm-starter 文件夹 把 m2-pom.xml重命&lt;/p&gt;
+
+&lt;blockquote&gt;&lt;p&gt;mv m2-pom.xml pom.xml&lt;/br&gt;
+mvn install&lt;/p&gt;&lt;/blockquote&gt;
+
+&lt;p&gt;   编译结果&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 9 seconds
+[INFO] Finished at: Tue Sep 23 23:36:05 CST 2014
+[INFO] Final Memory: 40M/85M&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;编译过程中请保持外网是可以正常访问的&lt;/p&gt;
+
+&lt;h2&gt;部署 到storm&lt;/h2&gt;
+
+&lt;p&gt;1.进入 target目录看到storm-starter-0.0.1-SNAPSHOT-jar-with-dependencies.jar 文件已经存在。把文件部署到 storm&lt;/p&gt;
+
+&lt;p&gt;2.提交 &lt;code&gt;./storm jar /export/data/storm/storm-starter-0.0.1-SNAPSHOT-jar-with-dependencies.jar storm.starter.WordCountTopology wordcountTop －100&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;3.访问storm ui&lt;/p&gt;
+
+&lt;p&gt;http://10.37.129.3:8080/
+图如下
+&lt;img src=&quot;/css/images/st2.png&quot; alt=&quot;Alt text&quot; height=&quot;300&quot;&gt;&lt;/p&gt;
+
+&lt;h1&gt;总结&lt;/h1&gt;
+
+&lt;p&gt;有时候打包提交 会报错 Storm Found multiple defaults.yaml resources 。遇到这错误是因为storm的storm的defaultsyarm打进去了。这个文件在storm-core.jar里面已经有了，设置storm依赖的scope为provided好了&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>Centos 下 storm 单机部署</title>

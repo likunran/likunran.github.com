@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		
-                 <title>Centos 下 storm 单机部署</title>
+                 <title>storm提交程序</title>
                  <meta content="嘴哥的博客" name="description">
                 <meta content="storm  嘴哥 李坤然 likunran li kunran java mysql 博客 jd李坤然 广告 dsp ssp 精准通" name="keywords">
 		<link rel="stylesheet" href="/css/main.css" />
@@ -37,138 +37,98 @@
 			
 			
 		&emsp;&emsp;&emsp;&emsp;
-		标签：storm, jekyll, rdiscount
+		标签：storm, mysql, mybatis
 		&emsp;&emsp;&emsp;&emsp;
-		<time date="2014-09-18 00:00:00 +0800">2014-09-18</time>
+		<time date="2014-09-23 00:00:00 +0800">2014-09-23</time>
 	</div>
 
-	<h1>Centos 下 storm 单机部署</h1>
+	<h1>storm提交程序</h1>
 
-<p>从去年做广告效果统计接触storm开始。开始了解了storm 也有一段时间了。这段时间想在自己机器上部署个storm 但是发现网上没有太好点教程就决定自己写一篇单机部署。</p>
+<p>storm 已经部署完成准备写个例子测试下storm安装是否成功。当然选择了经典的代码storm-starter-master</p>
 
-<p>机子上的基本环境：</p>
+<p>开发环境：</p>
 
 <ul>
-<li>parallels 虚拟机</li>
-<li>centos</li>
-<li>python 2.6</li>
+<li>idea</li>
+<li>jdk 1.6</li>
+<li>maven</li>
+<li>git</li>
 </ul>
 
 
-<h2>jdk 替换</h2>
+<h2>下载 strom-starter-master</h2>
 
-<p>  1.首先卸载centos自带openjdk.
-  2.官网下载jdk .
-  3.配置环境变量 <code>vi /etc/profile</code></p>
+<p>运行 <code>git clone https://github.com/nathanmarz/storm-starter.git</code>，提示：</p>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">You are missing a library required for Markdown. Please run:ls
-export JAVA_HOME=/export/home/server/jdk1.6.0_25
-export CLASSPATH=$JAVA_HOME/jre/lib:$JAVA_HOME/lib
-export PATH=$PATH:$JAVA_HOME/bin</code></pre></div>
-
-
-<p>运行 java：<code>java -version</code>，提示：</p>
-
-<div class="highlight"><pre><code class="language-text" data-lang="text">You are missing a library required for Markdown. Please run:
-java version &quot;1.6.0_65&quot;
-Java(TM) SE Runtime Environment (build 1.6.0_65-b14-462-11M4609)
-Java HotSpot(TM) 64-Bit Server VM (build 20.65-b04-462, mixed mode)</code></pre></div>
+<div class="highlight"><pre><code class="language-text" data-lang="text">localhost:log likunran$ git clone https://github.com/nathanmarz/storm-starter.gi
+Cloning into &#39;storm-starter.gi&#39;...
+remote: Repository not found.
+fatal: repository &#39;https://github.com/nathanmarz/storm-starter.gi/&#39; not found
+localhost:log likunran$ git clone https://github.com/nathanmarz/storm-starter.git
+Cloning into &#39;storm-starter&#39;...
+remote: Counting objects: 756, done.
+remote: Total 756 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (756/756), 171.81 KiB | 117.00 KiB/s, done.
+Resolving deltas: 100% (274/274), done.
+Checking connectivity... done.</code></pre></div>
 
 
-<h2>python 安装</h2>
+<h2>maven 安装</h2>
 
-<p>运行 ｀python -v｀ 命令查看python 版本</p>
+<p>运行 ｀maven' 命令查看 maven是否安装</p>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text"># installing zipimport hook
-import zipimport # builtin
-# installed zipimport hook
-# /usr/lib64/python2.6/site.pyc matches /usr/lib64/python2.6/site.py</code></pre></div>
+<div class="highlight"><pre><code class="language-text" data-lang="text">localhost:log likunran$ maven
+-bash: maven: command not found</code></pre></div>
 
 
-<p>python 2.6 版本已经存在无需安装</p>
+<p>maven 没有安装，下载maven 配置环境变量</p>
 
-<h2>ZooKeeper 安装</h2>
+<blockquote><p>./etc/profile 文件   全局共有配置，无论哪个用户登录，都会读取此> 文件
+/etc/bashrc    （一般在这个文件中添加系统级环境变量）全局（公有）配置，bash shell执行时，不管是何种方式，都会读取此文件。
+~/.bash_profile  （一般在这个文件中添加用户级环境变量）</p></blockquote>
 
-<p>   1.官网下载zookeeper</p>
+<p>添加环境变量</p>
 
-<p>   修改配置文件如下</p>
+<blockquote><p>MAVEN_HOME=/Users/likunran/tools/apache-maven-2.2.1
+PATH=$MAVEN_HOME/bin:$PATH
+export MAVEN_HOME
+export PATH</p></blockquote>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">tickTime=2000
-dataDir=/home/hadoop/storage/zookeeper
-clientPort=2181
-initLimit=5
-syncLimit=2</code></pre></div>
+<p> <code>source .bash_profile</code></p>
 
+<h2>项目编译</h2>
 
-<p>具体的配置项的解释大家可以自己去查</p>
+<p>   1.进入到storm-starter 文件夹 把 m2-pom.xml重命</p>
 
-<h2>ZeroMQ 安装</h2>
+<blockquote><p>mv m2-pom.xml pom.xml</br>
+mvn install</p></blockquote>
 
-<p>从 http://download.zeromq.org/zeromq-2.1.7.tar.gz 下载</p>
+<p>   编译结果</p>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">tar zxf zeromq-2.1.7.tar.gz
-cd zeromq-2.1.7
-./configure
-make
-make install
-sudo ldconfig</code></pre></div>
-
-
-<h2>jzmq 安装</h2>
-
-<p>从http://github.com/nathanmarz/jzmq页面下载jzmq-master.zip</p>
-
-<div class="highlight"><pre><code class="language-text" data-lang="text">unzip -zxvf jzmq-master.zip
-cd jzmq
-./autogen.sh
-./configure
-make
-make install</code></pre></div>
+<div class="highlight"><pre><code class="language-text" data-lang="text">[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 9 seconds
+[INFO] Finished at: Tue Sep 23 23:36:05 CST 2014
+[INFO] Final Memory: 40M/85M</code></pre></div>
 
 
-<h2>Strom 安装</h2>
+<p>编译过程中请保持外网是可以正常访问的</p>
 
-<p> 我下载的是 0.9.0.1 这个版本可以选择是 jzmq或netty
- 修改配置文件如下</p>
+<h2>部署 到storm</h2>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">storm.zookeeper.servers:
-     - &quot;localhost&quot;
+<p>1.进入 target目录看到storm-starter-0.0.1-SNAPSHOT-jar-with-dependencies.jar 文件已经存在。把文件部署到 storm</p>
 
-storm.zookeeper.port: 2181
-storm.local.dir: /export/data/storm/tmp
-nimbus.host: &quot;localhost&quot;
-supervisor.slots.ports:
-    - 6700
-    - 6701
-    - 6702
-    - 6703</code></pre></div>
+<p>2.提交 <code>./storm jar /export/data/storm/storm-starter-0.0.1-SNAPSHOT-jar-with-dependencies.jar storm.starter.WordCountTopology wordcountTop －100</code></p>
 
-
-<p>由于我现在是单机部署 所以配置loccalhost  zookeeper.port 配置 刚才　zk 端口 2181</p>
-
-<p>启动 strom</p>
-
-<div class="highlight"><pre><code class="language-text" data-lang="text">storm nimbus&amp;
-storm supervisor&amp;
-storm ui&amp;</code></pre></div>
-
-
-<p>查看日志
-｀tail -f ui.log｀</p>
-
-<div class="highlight"><pre><code class="language-text" data-lang="text">2014-09-18 22:09:40 o.m.log [INFO] Logging to Logger[org.mortbay.log] via org.mortbay.log.Slf4jLog
-2014-09-18 22:09:40 o.m.log [INFO] Started SocketConnector@0.0.0.0:8080</code></pre></div>
-
-
-<p>访问strom ui</p>
+<p>3.访问storm ui</p>
 
 <p>http://10.37.129.3:8080/
 图如下
-<img src="/css/images/sui.png" alt="Alt text" height="300"></p>
+<img src="/css/images/st2.png" alt="Alt text" height="300"></p>
 
 <h1>总结</h1>
 
-<p>在安装过程中 zeromq 刚开始报错很多。根据提示一步步装其他软件就可以搞定。在外部访问虚拟机strom ui时 记得把端口打开</p>
+<p>有时候打包提交 会报错 Storm Found multiple defaults.yaml resources 。遇到这错误是因为storm的storm的defaultsyarm打进去了。这个文件在storm-core.jar里面已经有了，设置storm依赖的scope为provided好了</p>
 
 
 	<div class="eof">-EOF-</div>
@@ -176,8 +136,8 @@ storm ui&amp;</code></pre></div>
 	<hr />
 	<div class="page fix">
 		
+		<span class="prev"><a href="/2014/09/18/how-to-step-storm-on-centos.html">←《Centos 下 storm 单机部署》</a></span>
 		
-		<span class="next"><a href="/2014/09/23/how-to-deploy-strom-master.html">《storm提交程序》→</a></span>
 		
 	</div>
 	<hr />
