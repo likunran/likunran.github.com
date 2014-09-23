@@ -1,6 +1,6 @@
 ---
 layout: post
-title: storm提交程序
+title: storm提交程序 strom-starter-master
 category: storm
 summary: storm 已经部署完成准备写个例子测试下storm安装是否成功。当然选择了经典的代码storm-starter-master
 tags: [storm, mysql, mybatis]
