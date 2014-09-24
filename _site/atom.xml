@@ -4,7 +4,7 @@
  <title></title>
  <link href="/atom.xml" rel="self"/>
  <link href=""/>
- <updated>2014-09-24T00:10:15+08:00</updated>
+ <updated>2014-09-24T13:26:34+08:00</updated>
  <id></id>
  <author>
    <name></name>
@@ -13,11 +13,11 @@
 
  
  <entry>
-   <title>storm提交程序</title>
+   <title>storm提交程序 strom-starter-master</title>
    <link href="/2014/09/23/how-to-deploy-strom-master.html"/>
    <updated>2014-09-23T00:00:00+08:00</updated>
    <id>h/2014/09/23/how-to-deploy-strom-master</id>
-   <content type="html">&lt;h1&gt;storm提交程序&lt;/h1&gt;
+   <content type="html">&lt;h1&gt;storm提交程序 strom-starter-master&lt;/h1&gt;
 
 &lt;p&gt;storm 已经部署完成准备写个例子测试下storm安装是否成功。当然选择了经典的代码storm-starter-master&lt;/p&gt;
 
