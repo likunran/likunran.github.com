@@ -7,6 +7,8 @@
 
 /index.html
 
+/about/index.html
+
 /sitemap.txt
 
 
