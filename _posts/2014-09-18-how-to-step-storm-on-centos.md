@@ -4,6 +4,7 @@ title: Centos 下 storm 单机部署
 category: storm
 summary: 从去年做广告效果统计接触storm开始。开始了解了storm 也有一段时间了。这段时间想在自己机器上部署个storm 但是发现网上没有太好点教程就决定自己写一篇单机部署。
 tags: [storm, jekyll, rdiscount]
+urlId: 20140918
 ---
 
 {{ page.title }}
