@@ -1,0 +1,32 @@
+---
+layout: default
+---
+
+<div class="article-list">
+	{{ content }}
+</div>
+
+<aside class="aside">
+	<div>
+		<h3>分类</h3>
+		<ul>
+			{% for category in site.categories %}
+			<li><a href="/category.html#{{category[0]}}">{{category[0]}} ({{category[1] | size}})</a></li>
+			{% endfor %}
+		</ul>
+	</div>
+	<div>
+		<h3>链接</h3>
+		<ul>
+		   <li>
+                   <a href="http://www.izhangheng.com/" target="_blank" >张衡HENRY</a>
+                  </li>
+                  <li>
+		  <a href="http://www.uniorder.com/" target="_blank" >秋水</a>	
+                   </li>
+                  <li>
+                  <a href="http://www.xten.com" target="_blank" >xten</a>
+                  </li>
+		</ul>
+	</div>
+</aside>
