@@ -1,6 +1,6 @@
 ---
 layout: index 
-title: Kunran Li...
+title: Kunran Li|青头白菜...
 ---
 
 {% for post in site.posts %}
