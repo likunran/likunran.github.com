@@ -4,13 +4,210 @@
  <title></title>
  <link href="/atom.xml" rel="self"/>
  <link href=""/>
- <updated>2014-09-25T18:58:19+08:00</updated>
+ <updated>2014-09-27T21:50:42+08:00</updated>
  <id></id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>storm 结合 mybatis 数据 入库</title>
+   <link href="/2014/09/27/how-to-mysql-on-storm.html"/>
+   <updated>2014-09-27T00:00:00+08:00</updated>
+   <id>h/2014/09/27/how-to-mysql-on-storm</id>
+   <content type="html">&lt;h1&gt;storm 结合 mybatis 数据 入库&lt;/h1&gt;
+
+&lt;p&gt;storm strom-starter-master  项目WordCountTopology 进行操作数据扩展。使用 druid作为数据源 用spring+mybatis 计算结果写到msql中。&lt;/p&gt;
+
+&lt;p&gt;机子上的基本环境：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;mysql&lt;/li&gt;
+&lt;li&gt;idea&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h2&gt;mysql&lt;/h2&gt;
+
+&lt;p&gt;  1.本地已经安装 mysql 启动mysql&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;bash-4.1#   /etc/init.d/mysqld  start
+  正在启动 mysqld： [确定]&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt; 执行：&lt;code&gt;mysql -uroot -p123456&lt;/code&gt;，提示：&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type &amp;#39;help;&amp;#39; or &amp;#39;\h&amp;#39; for help. Type &amp;#39;\c&amp;#39; to clear the current input statement.
+
+mysql&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;2.建立数据库和数据表 完成后结果如下&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;mysql&amp;gt; use uyicu
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql&amp;gt; desc system_log
+    -&amp;gt; ;
++-------------+---------------+------+-----+---------+----------------+
+| Field       | Type          | Null | Key | Default | Extra          |
++-------------+---------------+------+-----+---------+----------------+
+| id          | int(4)        | NO   | PRI | NULL    | auto_increment |
+| log_name    | varchar(1000) | YES  |     | NULL    |                |
+| log_value   | varchar(1000) | YES  |     | NULL    |                |
+| create_time | datetime      | YES  |     | NULL    |                |
+| modify_time | datetime      | YES  |     | NULL    |                |
+| yn          | int(11)       | YES  |     | NULL    |                |
++-------------+---------------+------+-----+---------+----------------+
+6 rows in set (0.00 sec)
+
+mysql&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;strom-starter 添加 pom依赖&lt;/h2&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;&amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-core&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring.version}&amp;lt;/version&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-beans&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring.version}&amp;lt;/version&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-context&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring.version}&amp;lt;/version&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-context-support&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring.version}&amp;lt;/version&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-aop&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring.version}&amp;lt;/version&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-aspects&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring.version}&amp;lt;/version&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-tx&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring.version}&amp;lt;/version&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-jdbc&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring.version}&amp;lt;/version&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+              &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;mysql&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;mysql-connector-java&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;5.1.26&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.mybatis&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;mybatis-spring&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;1.2.0&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.mybatis&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;mybatis&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;3.2.2&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;druid&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;0.2.25&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;添加spring+mybatis配置文件&lt;/h2&gt;
+
+&lt;p&gt;   mybatis 配置大家开参考 spring mybatis配置篇
+   添加 spring-config.xml
+       spring-config-dao.xml&lt;/p&gt;
+
+&lt;h2&gt;添加SpringUtils&lt;/h2&gt;
+
+&lt;p&gt;   springUtils用于加载spring 配置
+  ｀&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public static void build() {
+
+    if (null == factory) {
+        factory = new ClassPathXmlApplicationContext(&quot;spring-config.xml&quot;);
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;｀&lt;/p&gt;
+
+&lt;h2&gt;storm RandomSentenceSpout 代码修改&lt;/h2&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;private ULogMapper uLogMapper;
+
+
+    /**
+     * open 方法用于初始化
+     * @param conf
+     * @param context
+     * @param collector
+     */
+  @Override
+  public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
+    _collector = collector;
+
+      uLogMapper= SpringUtils.uLogMapperInstance();
+      _rand = new Random();
+  }
+
+    /**
+     * 在SpoutTracker类中被调用，每调用一次就可以向storm集群中发射一条数据（一个Tuple元组），该方法会被不停的调用
+     */
+  @Override
+  public void nextTuple() {
+
+
+
+      ULog uLog=new ULog();
+      uLog.setCreateTime(new Date());
+      uLog.setLogName(&amp;quot;nameSpout&amp;quot;);
+      uLog.setLogValue(&amp;quot;value&amp;quot;);
+      uLogMapper.insert(uLog) ;
+
+    Utils.sleep(100);
+    String[] sentences = new String[]{ &amp;quot;the cow jumped over the moon&amp;quot;, &amp;quot;an apple a day keeps the doctor away&amp;quot;,
+        &amp;quot;four score and seven years ago&amp;quot;, &amp;quot;snow white and the seven dwarfs&amp;quot;, &amp;quot;i am at two with nature&amp;quot; };
+    String sentence = sentences[_rand.nextInt(sentences.length)];
+    _collector.emit(new Values(sentence));
+  }&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;总结&lt;/h1&gt;
+
+&lt;p&gt;在本地模式运行成功&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>storm提交程序 strom-starter-master</title>

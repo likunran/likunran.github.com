@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		
+                 <title>storm 结合 mybatis 数据 入库</title>
+                 <meta content="嘴哥的博客" name="description">
+                <meta content="storm 青头白菜 嘴哥 李坤然 likunran li kunran java mysql 博客 jd李坤然 广告 dsp ssp 精准通" name="keywords">
+		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/pygments_native.css" />
+		<link rel="stylesheet" href="http://fonts.useso.com/css?family=Handlee">
+<link rel="Shortcut Icon" href="http://www.uyicu.com/favicon.ico" type="image/x-icon" />
+	</head>
+	<body>
+		<header id="header">
+			<div class="header-info fix">
+				<h1><a href="/">青头白菜</a></h1>
+				<p class="describe">&lt;嘴哥  /&gt;</p>
+				<nav class="navigation">
+					<ul>
+						<li><a href="/">首页</a></li>
+						<li><a href="/archive.html">列表</a></li>
+						<li><a href="/about">关于</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header><!--/header end-->
+
+		<section id="content" class="fix">
+			<article id="post">
+	<a href="#" class="icon-fullscreen r" title="点击全屏显示"></a>
+	<div class="c9">
+		分类：
+			
+			<a href="/category.html#storm">storm</a>
+			
+			
+		&emsp;&emsp;&emsp;&emsp;
+		标签：storm, jekyll, rdiscount
+		&emsp;&emsp;&emsp;&emsp;
+		<time date="2014-09-27 00:00:00 +0800">2014-09-27</time>
+	</div>
+
+	<h1>storm 结合 mybatis 数据 入库</h1>
+
+<p>storm strom-starter-master  项目WordCountTopology 进行操作数据扩展。使用 druid作为数据源 用spring+mybatis 计算结果写到msql中。</p>
+
+<p>机子上的基本环境：</p>
+
+<ul>
+<li>mysql</li>
+<li>idea</li>
+</ul>
+
+
+<h2>mysql</h2>
+
+<p>  1.本地已经安装 mysql 启动mysql</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">bash-4.1#   /etc/init.d/mysqld  start
+  正在启动 mysqld： [确定]</code></pre></div>
+
+
+<p> 执行：<code>mysql -uroot -p123456</code>，提示：</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type &#39;help;&#39; or &#39;\h&#39; for help. Type &#39;\c&#39; to clear the current input statement.
+
+mysql&gt;</code></pre></div>
+
+
+<p>2.建立数据库和数据表 完成后结果如下</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">mysql&gt; use uyicu
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql&gt; desc system_log
+    -&gt; ;
++-------------+---------------+------+-----+---------+----------------+
+| Field       | Type          | Null | Key | Default | Extra          |
++-------------+---------------+------+-----+---------+----------------+
+| id          | int(4)        | NO   | PRI | NULL    | auto_increment |
+| log_name    | varchar(1000) | YES  |     | NULL    |                |
+| log_value   | varchar(1000) | YES  |     | NULL    |                |
+| create_time | datetime      | YES  |     | NULL    |                |
+| modify_time | datetime      | YES  |     | NULL    |                |
+| yn          | int(11)       | YES  |     | NULL    |                |
++-------------+---------------+------+-----+---------+----------------+
+6 rows in set (0.00 sec)
+
+mysql&gt;</code></pre></div>
+
+
+<h2>strom-starter 添加 pom依赖</h2>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">&lt;dependency&gt;
+                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-core&lt;/artifactId&gt;
+                &lt;version&gt;${spring.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-beans&lt;/artifactId&gt;
+                &lt;version&gt;${spring.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-context&lt;/artifactId&gt;
+                &lt;version&gt;${spring.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-context-support&lt;/artifactId&gt;
+                &lt;version&gt;${spring.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-aop&lt;/artifactId&gt;
+                &lt;version&gt;${spring.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-aspects&lt;/artifactId&gt;
+                &lt;version&gt;${spring.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-tx&lt;/artifactId&gt;
+                &lt;version&gt;${spring.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-jdbc&lt;/artifactId&gt;
+                &lt;version&gt;${spring.version}&lt;/version&gt;
+            &lt;/dependency&gt;
+              &lt;dependency&gt;
+            &lt;groupId&gt;mysql&lt;/groupId&gt;
+            &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+            &lt;version&gt;5.1.26&lt;/version&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
+            &lt;artifactId&gt;mybatis-spring&lt;/artifactId&gt;
+            &lt;version&gt;1.2.0&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
+            &lt;artifactId&gt;mybatis&lt;/artifactId&gt;
+            &lt;version&gt;3.2.2&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
+            &lt;artifactId&gt;druid&lt;/artifactId&gt;
+            &lt;version&gt;0.2.25&lt;/version&gt;
+        &lt;/dependency&gt;</code></pre></div>
+
+
+<h2>添加spring+mybatis配置文件</h2>
+
+<p>   mybatis 配置大家开参考 spring mybatis配置篇
+   添加 spring-config.xml
+       spring-config-dao.xml</p>
+
+<h2>添加SpringUtils</h2>
+
+<p>   springUtils用于加载spring 配置
+  ｀</p>
+
+<pre><code>public static void build() {
+
+    if (null == factory) {
+        factory = new ClassPathXmlApplicationContext("spring-config.xml");
+    }
+
+}
+</code></pre>
+
+<p>｀</p>
+
+<h2>storm RandomSentenceSpout 代码修改</h2>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">private ULogMapper uLogMapper;
+
+
+    /**
+     * open 方法用于初始化
+     * @param conf
+     * @param context
+     * @param collector
+     */
+  @Override
+  public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
+    _collector = collector;
+
+      uLogMapper= SpringUtils.uLogMapperInstance();
+      _rand = new Random();
+  }
+
+    /**
+     * 在SpoutTracker类中被调用，每调用一次就可以向storm集群中发射一条数据（一个Tuple元组），该方法会被不停的调用
+     */
+  @Override
+  public void nextTuple() {
+
+
+
+      ULog uLog=new ULog();
+      uLog.setCreateTime(new Date());
+      uLog.setLogName(&quot;nameSpout&quot;);
+      uLog.setLogValue(&quot;value&quot;);
+      uLogMapper.insert(uLog) ;
+
+    Utils.sleep(100);
+    String[] sentences = new String[]{ &quot;the cow jumped over the moon&quot;, &quot;an apple a day keeps the doctor away&quot;,
+        &quot;four score and seven years ago&quot;, &quot;snow white and the seven dwarfs&quot;, &quot;i am at two with nature&quot; };
+    String sentence = sentences[_rand.nextInt(sentences.length)];
+    _collector.emit(new Values(sentence));
+  }</code></pre></div>
+
+
+<h1>总结</h1>
+
+<p>在本地模式运行成功</p>
+
+
+	<div class="eof">-EOF-</div>
+
+	<hr />
+	<div class="page fix">
+		
+		<span class="prev"><a href="/2014/09/23/how-to-deploy-strom-master.html">←《storm提交程序 strom-starter-master》</a></span>
+		
+		
+	</div>
+	<hr />
+</article>
+
+<div class="ds-thread" data-thread-key="20140927" data-title="storm 结合 mybatis 数据 入库" data-url="www.uyicu.com/2014/09/27/how-to-mysql-on-storm.html"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"likunran"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+
+<script src="/js/jquery-min.js"></script>
+<script src="/js/Fullscreen.js"></script>
+<script type="text/javascript">
+$(function() {
+	var global = window;
+
+	// =============== 全屏显示 ==================
+	(function() {
+		var icon = $( 'a.icon-fullscreen' ),
+			fs, fsCallback;
+		
+		fsCallback = function(isFullscreen) {
+				if (isFullscreen) {
+					icon.addClass('expand').attr('title', 'ESC 退出全屏');
+				}
+				else {
+					icon.removeClass('expand').attr('title', '点击全屏显示');
+				}
+			};
+			
+		fs = new Fullscreen({
+				element: $('#post'),
+				noSafari: true,
+				callback: fsCallback
+			});
+
+		if (fs.fullscreenEnabled) {
+			icon.on('click', function() {
+				fs.toggleFullscreen();
+				return false;
+			});
+		}
+		else {
+			icon.hide();
+		}
+	})();
+
+
+	// ============== 目录提取 ===============
+	(function() {
+		// 设置无目录时，不显示
+		if (!parseInt('', 10)) {
+			return;
+		}
+
+		var dom = $('<fieldset id="catalogue"><legend>目录</legend></fieldset>'),
+			count = 0;
+		
+		$('#post').find('h2,h3,h4,h5').each(function() {
+			var name = 'catalogue_' + count++;
+			dom.append('<div class="txt_' + this.tagName + '">' +
+				'<a href="#' + name + '">' +
+					this.innerHTML +
+				'</a></div>');
+			this.id = name;
+		});
+
+		dom.appendTo('body');
+	})();
+});
+</script>
+<script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/button.js#uuid=&amp;style=5&amp;fs=4&amp;bgcolor=Green&amp;pophcol=1"></script>
+
+
+		</section><!--/content end-->
+
+
+		<footer id="footer">
+			<p class="l">
+				&copy;2014 <a href="/">青头白菜</a>
+				&emsp;&emsp;&emsp;
+				<a href="mailto:likunran@gmail.com" target="_blank">Email me</a>
+				<span class="c9">|</span>
+				<a href="https://github.com/calefy/calefy.github.com" target="_blank">Fork me on GitHub</a>
+			</p>
+			<p class="r">Powered by <a href="https://github.com/mojombo/jekyll" target="_blank">Jekyll</a></p>
+			<p class="tac">
+				『书到用时方恨少』
+			</p>
+			<!--getclicky begin-->
+			<div class="c">
+			</div>
+			<!--getclicky end-->
+		</footer><!--/footer end-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-54961311-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+	</body>
+</html>
