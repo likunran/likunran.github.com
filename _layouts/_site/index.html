@@ -1,19 +1,16 @@
----
-layout: default
----
-
 <div class="article-list">
-	{{ content }}
+	
 </div>
 
 <aside class="aside">
 	<div>
       <h3>about me</h3>
 		<h3>分类</h3>
+               <ul><li>
+               青头白菜 京东广告研发工程师
+               </li> </ul>
 		<ul>
-			{% for category in site.categories %}
-			<li><a href="/category.html#{{category[0]}}">{{category[0]}} ({{category[1] | size}})</a></li>
-			{% endfor %}
+			
 		</ul>
 	</div>
 	<div>

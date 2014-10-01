@@ -1,0 +1,99 @@
+<article id="post">
+	<a href="#" class="icon-fullscreen r" title="点击全屏显示"></a>
+	<div class="c9">
+		分类：
+			
+		&emsp;&emsp;&emsp;&emsp;
+		标签：
+		&emsp;&emsp;&emsp;&emsp;
+		<time date=""></time>
+	</div>
+
+	
+
+	<div class="eof">-EOF-</div>
+
+	<hr />
+	<div class="page fix">
+		
+		
+	</div>
+	<hr />
+</article>
+
+<div class="ds-thread" data-thread-key="" data-title="" data-url="www.uyicu.com/post.html"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"likunran"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+
+<script src="/js/jquery-min.js"></script>
+<script src="/js/Fullscreen.js"></script>
+<script type="text/javascript">
+$(function() {
+	var global = window;
+
+	// =============== 全屏显示 ==================
+	(function() {
+		var icon = $( 'a.icon-fullscreen' ),
+			fs, fsCallback;
+		
+		fsCallback = function(isFullscreen) {
+				if (isFullscreen) {
+					icon.addClass('expand').attr('title', 'ESC 退出全屏');
+				}
+				else {
+					icon.removeClass('expand').attr('title', '点击全屏显示');
+				}
+			};
+			
+		fs = new Fullscreen({
+				element: $('#post'),
+				noSafari: true,
+				callback: fsCallback
+			});
+
+		if (fs.fullscreenEnabled) {
+			icon.on('click', function() {
+				fs.toggleFullscreen();
+				return false;
+			});
+		}
+		else {
+			icon.hide();
+		}
+	})();
+
+
+	// ============== 目录提取 ===============
+	(function() {
+		// 设置无目录时，不显示
+		if (!parseInt('', 10)) {
+			return;
+		}
+
+		var dom = $('<fieldset id="catalogue"><legend>目录</legend></fieldset>'),
+			count = 0;
+		
+		$('#post').find('h2,h3,h4,h5').each(function() {
+			var name = 'catalogue_' + count++;
+			dom.append('<div class="txt_' + this.tagName + '">' +
+				'<a href="#' + name + '">' +
+					this.innerHTML +
+				'</a></div>');
+			this.id = name;
+		});
+
+		dom.appendTo('body');
+	})();
+});
+</script>
+<script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/button.js#uuid=&amp;style=5&amp;fs=4&amp;bgcolor=Green&amp;pophcol=1"></script>
+
