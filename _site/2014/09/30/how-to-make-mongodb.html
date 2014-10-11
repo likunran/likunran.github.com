@@ -52,179 +52,58 @@
 </ul>
 
 
-<h2>mysql</h2>
+<h2>下载</h2>
 
-<p>  1.本地已经安装 mysql 启动mysql</p>
+<p>  下载mongodb-linux-x86_64-2.4.9.tgz</p>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">bash-4.1#   /etc/init.d/mysqld  start
-  正在启动 mysqld： [确定]</code></pre></div>
+<p>  修改配置文件</p>
 
-
-<p> 执行：<code>mysql -uroot -p123456</code>，提示：</p>
-
-<div class="highlight"><pre><code class="language-text" data-lang="text">Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.
-
-Oracle is a registered trademark of Oracle Corporation and/or its
-affiliates. Other names may be trademarks of their respective
-owners.
-
-Type &#39;help;&#39; or &#39;\h&#39; for help. Type &#39;\c&#39; to clear the current input statement.
-
-mysql&gt;</code></pre></div>
+<div class="highlight"><pre><code class="language-text" data-lang="text">tar zxvf mongodb-linux-x86_64-2.4.9.tgz
+mv mongodb-linux-x86_64-2.4.9 mongodb
+cd mongodb
+mkdir db
+mkdir logs
+cd bin</code></pre></div>
 
 
-<p>2.建立数据库和数据表 完成后结果如下</p>
+<h2>配置mongodb</h2>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">mysql&gt; use uyicu
-Reading table information for completion of table and column names
-You can turn off this feature to get a quicker startup with -A
+<p>新建配置文件</p>
 
-Database changed
-mysql&gt; desc system_log
-    -&gt; ;
-+-------------+---------------+------+-----+---------+----------------+
-| Field       | Type          | Null | Key | Default | Extra          |
-+-------------+---------------+------+-----+---------+----------------+
-| id          | int(4)        | NO   | PRI | NULL    | auto_increment |
-| log_name    | varchar(1000) | YES  |     | NULL    |                |
-| log_value   | varchar(1000) | YES  |     | NULL    |                |
-| create_time | datetime      | YES  |     | NULL    |                |
-| modify_time | datetime      | YES  |     | NULL    |                |
-| yn          | int(11)       | YES  |     | NULL    |                |
-+-------------+---------------+------+-----+---------+----------------+
-6 rows in set (0.00 sec)
-
-mysql&gt;</code></pre></div>
+<div class="highlight"><pre><code class="language-text" data-lang="text">vi mongodb.conf
+添加配置文件
+dbpath = /export/data/mongo/db            
+logpath = /export/data/mongo/log
+logappend = true                  
+ 
+port = 27017                     
+fork = true</code></pre></div>
 
 
-<h2>strom-starter 添加 pom依赖</h2>
+<h2>mongodb</h2>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">&lt;dependency&gt;
-                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-core&lt;/artifactId&gt;
-                &lt;version&gt;${spring.version}&lt;/version&gt;
-            &lt;/dependency&gt;
-            &lt;dependency&gt;
-                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-beans&lt;/artifactId&gt;
-                &lt;version&gt;${spring.version}&lt;/version&gt;
-            &lt;/dependency&gt;
-            &lt;dependency&gt;
-                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-context&lt;/artifactId&gt;
-                &lt;version&gt;${spring.version}&lt;/version&gt;
-            &lt;/dependency&gt;
-            &lt;dependency&gt;
-                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-context-support&lt;/artifactId&gt;
-                &lt;version&gt;${spring.version}&lt;/version&gt;
-            &lt;/dependency&gt;
+<p>  ./mongod --config mongodb.conf<br/>
+  bin/mongo
+  进入shell命令后</p>
 
-            &lt;dependency&gt;
-                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-aop&lt;/artifactId&gt;
-                &lt;version&gt;${spring.version}&lt;/version&gt;
-            &lt;/dependency&gt;
-            &lt;dependency&gt;
-                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-aspects&lt;/artifactId&gt;
-                &lt;version&gt;${spring.version}&lt;/version&gt;
-            &lt;/dependency&gt;
-            &lt;dependency&gt;
-                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-tx&lt;/artifactId&gt;
-                &lt;version&gt;${spring.version}&lt;/version&gt;
-            &lt;/dependency&gt;
-            &lt;dependency&gt;
-                &lt;groupId&gt;org.springframework&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-jdbc&lt;/artifactId&gt;
-                &lt;version&gt;${spring.version}&lt;/version&gt;
-            &lt;/dependency&gt;
-              &lt;dependency&gt;
-            &lt;groupId&gt;mysql&lt;/groupId&gt;
-            &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
-            &lt;version&gt;5.1.26&lt;/version&gt;
-        &lt;/dependency&gt;
+<p>  `
+use likunran //切换数据库不存在不存在创建
+db.addUser(“root”,"123456")</p>
 
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
-            &lt;artifactId&gt;mybatis-spring&lt;/artifactId&gt;
-            &lt;version&gt;1.2.0&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
-            &lt;artifactId&gt;mybatis&lt;/artifactId&gt;
-            &lt;version&gt;3.2.2&lt;/version&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
-            &lt;artifactId&gt;druid&lt;/artifactId&gt;
-            &lt;version&gt;0.2.25&lt;/version&gt;
-        &lt;/dependency&gt;</code></pre></div>
+<p>db.auth("root","123456”)<br/>
+ `</p>
 
+<p>重启 mongodb</p>
 
-<h2>添加spring+mybatis配置文件</h2>
+<p>使用账号和密码登录mongodb
+mongo likunran -uroot -p123456</p>
 
-<p>   mybatis 配置大家开参考 spring mybatis配置篇
-   添加 spring-config.xml
-       spring-config-dao.xml</p>
-
-<h2>添加SpringUtils</h2>
-
-<p>   springUtils用于加载spring 配置
-  ｀</p>
-
-<pre><code>public static void build() {
-
-    if (null == factory) {
-        factory = new ClassPathXmlApplicationContext("spring-config.xml");
-    }
-
-}
-</code></pre>
-
-<p>｀</p>
-
-<h2>storm RandomSentenceSpout 代码修改</h2>
-
-<div class="highlight"><pre><code class="language-text" data-lang="text">private ULogMapper uLogMapper;
-
-
-    /**
-     * open 方法用于初始化
-     * @param conf
-     * @param context
-     * @param collector
-     */
-  @Override
-  public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
-    _collector = collector;
-
-      uLogMapper= SpringUtils.uLogMapperInstance();
-      _rand = new Random();
-  }
-
-    /**
-     * 在SpoutTracker类中被调用，每调用一次就可以向storm集群中发射一条数据（一个Tuple元组），该方法会被不停的调用
-     */
-  @Override
-  public void nextTuple() {
-
-
-
-      ULog uLog=new ULog();
-      uLog.setCreateTime(new Date());
-      uLog.setLogName(&quot;nameSpout&quot;);
-      uLog.setLogValue(&quot;value&quot;);
-      uLogMapper.insert(uLog) ;
-
-    Utils.sleep(100);
-    String[] sentences = new String[]{ &quot;the cow jumped over the moon&quot;, &quot;an apple a day keeps the doctor away&quot;,
-        &quot;four score and seven years ago&quot;, &quot;snow white and the seven dwarfs&quot;, &quot;i am at two with nature&quot; };
-    String sentence = sentences[_rand.nextInt(sentences.length)];
-    _collector.emit(new Values(sentence));
-  }</code></pre></div>
-
+<p>show dbs
+use likunran //切换数据库不存在不存在创建
+show collections
+db.likunran.insert({'name':'likunran'});
+show collections
+db.likunran.find()</p>
 
 <h1>总结</h1>
 
