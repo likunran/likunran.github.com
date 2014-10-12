@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		
+                 <title>设计模式－单例</title>
+                 <meta content="嘴哥的博客" name="description">
+                <meta content="storm 青头白菜 嘴哥 李坤然 likunran li kunran java mysql 博客 jd李坤然 广告 dsp ssp 精准通" name="keywords">
+		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/pygments_native.css" />
+		<link rel="stylesheet" href="http://fonts.useso.com/css?family=Handlee">
+<link rel="Shortcut Icon" href="http://www.uyicu.com/favicon.ico" type="image/x-icon" />
+	</head>
+	<body>
+		<header id="header">
+			<div class="header-info fix">
+				<h1><a href="/">青头白菜</a></h1>
+				<p class="describe">&lt;嘴哥  /&gt;</p>
+				<nav class="navigation">
+					<ul>
+						<li><a href="/">首页</a></li>
+						<li><a href="/archive.html">列表</a></li>
+						<li><a href="/about">关于</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header><!--/header end-->
+		<section id="content" class="fix">
+			<article id="post">
+	<a href="#" class="icon-fullscreen r" title="点击全屏显示"></a>
+	<div class="c9">
+		分类：
+			
+			<a href="/category.html#设计模式">设计模式</a>
+			
+			
+		&emsp;&emsp;&emsp;&emsp;
+		标签：设计模式，单例
+		&emsp;&emsp;&emsp;&emsp;
+		<time date="2014-10-12 00:00:00 +0800">2014-10-12</time>
+	</div>
+
+	<h1>设计模式－单例</h1>
+
+<p>Singleton（单例）模式设计模式。由于设计模式在面向对象程序设计中有这举足轻重单作用。一些公司面试过程中很多公司都喜欢问一些设计模式相关问题。Singleton 是唯一一个能够用短短几十行代码完成都设计模式。因此singleton的类型的是一个很常见的面试题。</p>
+
+<h2>题目：设计一个类 我们只能生成一个实例</h2>
+
+<h3>解法一</h3>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">public class SingletonOffer {
+
+    private SingletonOffer() {
+
+    }
+
+    private static SingletonOffer _instance = null;
+
+    public static SingletonOffer instance() {
+        if (null == _instance) {
+            _instance = new SingletonOffer();
+        }
+        return _instance;
+
+    }
+
+    public static void main(String[] args) {
+        System.out.print(SingletonOffer.instance());
+    }
+
+}</code></pre></div>
+
+
+<h2>评点</h2>
+
+<p>   SingletonOffer 把构造函数设为私有变量禁止他人创建。 只能静态 instance() 方法 创建SingletonOffer 实例。只有<em>instance 为null时才会创建实例。但是在多线程下由于并非问题会出现实例多个</em>instance.</p>
+
+<h3>优化后</h3>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">public static SingletonOffer instance() {
+        synchronized (_instance) {
+            if (null == _instance) {
+
+                _instance = new SingletonOffer();
+            }
+        }
+        return _instance;
+
+    }</code></pre></div>
+
+
+<p>  由于同一个时间只能有一个线程得到同步锁。当一个线程持有锁时第二个线程等待。第二个线程持有时就判断_instance 已经被实例化。这样就多线程多问题。但是每一次都需要锁比较消耗性能。客户进一步优化代码</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">public static SingletonOffer instance() {
+
+        if (null == _instance) {
+            synchronized (_instance) {
+                if (null == _instance) {
+
+                    _instance = new SingletonOffer();
+                }
+            }
+        }
+        return _instance;
+
+    }</code></pre></div>
+
+
+<p><em>instace 为null时加锁。当</em>instace已经创建出来后。就不需要加锁了。</p>
+
+<h2>静态构造函数</h2>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">static SingletonOfferLock _instance =new SingletonOfferLock();
+    private SingletonOfferLock(){
+
+    }
+
+    public static SingletonOfferLock instance(){
+        return _instance;
+    }
+
+    public static void main(String[] args) {
+        System.out.print(SingletonOfferLock.instance());
+    }</code></pre></div>
+
+
+<p>  使用静态变量初始化_instance代码非常简洁。静态变量会在程序程序初始化时创建一个实例。 但是这个实例是系统控制的。无论需要不需要第一次调用SingletonOfferLock都会被创建。实例创建过早会降低内存的使用效率。</p>
+
+<h2>优化</h2>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">public class SingletonOfferLock {
+
+
+    private SingletonOfferLock(){
+
+    }
+
+    public static SingletonOfferLock instance(){
+        return Nested.instance;
+    }
+
+    public static void main(String[] args) {
+        System.out.print(SingletonOfferLock.instance());
+    }
+
+   static class Nested{
+       private  Nested(){
+
+       }
+
+       static final SingletonOfferLock instance = new SingletonOfferLock();
+   }
+
+}</code></pre></div>
+
+
+<p>由于Nested是私有变量 别人无法使用Nested类型。因此只有我们第一次试图通过属性创建 instance 时。对象才被实例化。</p>
+
+
+	<div class="eof">-EOF-</div>
+
+	<hr />
+	<div class="page fix">
+		
+		<span class="prev"><a href="/2014/10/10/how-to-install-flume.html">←《flume 单机部署》</a></span>
+		
+		
+	</div>
+	<hr />
+</article>
+
+<div class="ds-thread" data-thread-key="20141013" data-title="设计模式－单例" data-url="www.uyicu.com/2014/10/12/design-pattern-signleton.html"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"likunran"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+
+<script src="/js/jquery-min.js"></script>
+<script src="/js/Fullscreen.js"></script>
+<script type="text/javascript">
+$(function() {
+	var global = window;
+
+	// =============== 全屏显示 ==================
+	(function() {
+		var icon = $( 'a.icon-fullscreen' ),
+			fs, fsCallback;
+		
+		fsCallback = function(isFullscreen) {
+				if (isFullscreen) {
+					icon.addClass('expand').attr('title', 'ESC 退出全屏');
+				}
+				else {
+					icon.removeClass('expand').attr('title', '点击全屏显示');
+				}
+			};
+			
+		fs = new Fullscreen({
+				element: $('#post'),
+				noSafari: true,
+				callback: fsCallback
+			});
+
+		if (fs.fullscreenEnabled) {
+			icon.on('click', function() {
+				fs.toggleFullscreen();
+				return false;
+			});
+		}
+		else {
+			icon.hide();
+		}
+	})();
+
+
+	// ============== 目录提取 ===============
+	(function() {
+		// 设置无目录时，不显示
+		if (!parseInt('', 10)) {
+			return;
+		}
+
+		var dom = $('<fieldset id="catalogue"><legend>目录</legend></fieldset>'),
+			count = 0;
+		
+		$('#post').find('h2,h3,h4,h5').each(function() {
+			var name = 'catalogue_' + count++;
+			dom.append('<div class="txt_' + this.tagName + '">' +
+				'<a href="#' + name + '">' +
+					this.innerHTML +
+				'</a></div>');
+			this.id = name;
+		});
+
+		dom.appendTo('body');
+	})();
+});
+</script>
+<script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/button.js#uuid=&amp;style=5&amp;fs=4&amp;bgcolor=Green&amp;pophcol=1"></script>
+
+
+		</section><!--/content end-->
+
+
+		<footer id="footer">
+			<p class="l">
+				&copy;2014 <a href="/">青头白菜</a>
+				&emsp;&emsp;&emsp;
+				<a href="mailto:likunran@gmail.com" target="_blank">Email me</a>
+				<span class="c9">|</span>
+				<a href="https://github.com/calefy/calefy.github.com" target="_blank">Fork me on GitHub</a>
+			</p>
+			<p class="r">Powered by <a href="https://github.com/mojombo/jekyll" target="_blank">Jekyll</a></p>
+			<p class="tac">
+				『书到用时方恨少』
+			</p>
+			<!--getclicky begin-->
+			<div class="c">
+			</div>
+			<!--getclicky end-->
+		</footer><!--/footer end-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-54961311-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+	</body>
+</html>

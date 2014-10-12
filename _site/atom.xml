@@ -4,13 +4,136 @@
  <title></title>
  <link href="/atom.xml" rel="self"/>
  <link href=""/>
- <updated>2014-10-11T22:54:12+08:00</updated>
+ <updated>2014-10-12T17:32:43+08:00</updated>
  <id></id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>设计模式－单例</title>
+   <link href="/2014/10/12/design-pattern-signleton.html"/>
+   <updated>2014-10-12T00:00:00+08:00</updated>
+   <id>h/2014/10/12/design-pattern-signleton</id>
+   <content type="html">&lt;h1&gt;设计模式－单例&lt;/h1&gt;
+
+&lt;p&gt;Singleton（单例）模式设计模式。由于设计模式在面向对象程序设计中有这举足轻重单作用。一些公司面试过程中很多公司都喜欢问一些设计模式相关问题。Singleton 是唯一一个能够用短短几十行代码完成都设计模式。因此singleton的类型的是一个很常见的面试题。&lt;/p&gt;
+
+&lt;h2&gt;题目：设计一个类 我们只能生成一个实例&lt;/h2&gt;
+
+&lt;h3&gt;解法一&lt;/h3&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;public class SingletonOffer {
+
+    private SingletonOffer() {
+
+    }
+
+    private static SingletonOffer _instance = null;
+
+    public static SingletonOffer instance() {
+        if (null == _instance) {
+            _instance = new SingletonOffer();
+        }
+        return _instance;
+
+    }
+
+    public static void main(String[] args) {
+        System.out.print(SingletonOffer.instance());
+    }
+
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;评点&lt;/h2&gt;
+
+&lt;p&gt;   SingletonOffer 把构造函数设为私有变量禁止他人创建。 只能静态 instance() 方法 创建SingletonOffer 实例。只有&lt;em&gt;instance 为null时才会创建实例。但是在多线程下由于并非问题会出现实例多个&lt;/em&gt;instance.&lt;/p&gt;
+
+&lt;h3&gt;优化后&lt;/h3&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;public static SingletonOffer instance() {
+        synchronized (_instance) {
+            if (null == _instance) {
+
+                _instance = new SingletonOffer();
+            }
+        }
+        return _instance;
+
+    }&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;  由于同一个时间只能有一个线程得到同步锁。当一个线程持有锁时第二个线程等待。第二个线程持有时就判断_instance 已经被实例化。这样就多线程多问题。但是每一次都需要锁比较消耗性能。客户进一步优化代码&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;public static SingletonOffer instance() {
+
+        if (null == _instance) {
+            synchronized (_instance) {
+                if (null == _instance) {
+
+                    _instance = new SingletonOffer();
+                }
+            }
+        }
+        return _instance;
+
+    }&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;em&gt;instace 为null时加锁。当&lt;/em&gt;instace已经创建出来后。就不需要加锁了。&lt;/p&gt;
+
+&lt;h2&gt;静态构造函数&lt;/h2&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;static SingletonOfferLock _instance =new SingletonOfferLock();
+    private SingletonOfferLock(){
+
+    }
+
+    public static SingletonOfferLock instance(){
+        return _instance;
+    }
+
+    public static void main(String[] args) {
+        System.out.print(SingletonOfferLock.instance());
+    }&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;  使用静态变量初始化_instance代码非常简洁。静态变量会在程序程序初始化时创建一个实例。 但是这个实例是系统控制的。无论需要不需要第一次调用SingletonOfferLock都会被创建。实例创建过早会降低内存的使用效率。&lt;/p&gt;
+
+&lt;h2&gt;优化&lt;/h2&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;public class SingletonOfferLock {
+
+
+    private SingletonOfferLock(){
+
+    }
+
+    public static SingletonOfferLock instance(){
+        return Nested.instance;
+    }
+
+    public static void main(String[] args) {
+        System.out.print(SingletonOfferLock.instance());
+    }
+
+   static class Nested{
+       private  Nested(){
+
+       }
+
+       static final SingletonOfferLock instance = new SingletonOfferLock();
+   }
+
+}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;由于Nested是私有变量 别人无法使用Nested类型。因此只有我们第一次试图通过属性创建 instance 时。对象才被实例化。&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>flume 单机部署</title>

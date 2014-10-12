@@ -13,6 +13,8 @@
 
 
 
+/2014/10/12/design-pattern-signleton.html
+
 /2014/10/10/how-to-install-flume.html
 
 /2014/09/30/how-to-make-mongodb.html
