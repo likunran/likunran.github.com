@@ -13,6 +13,8 @@
 
 
 
+/2014/10/13/java-array.html
+
 /2014/10/12/design-pattern-signleton.html
 
 /2014/10/10/how-to-install-flume.html
