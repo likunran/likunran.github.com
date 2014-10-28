@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		
+                 <title>kafka单机部署</title>
+                 <meta content="嘴哥的博客" name="description">
+                <meta content="storm 青头白菜 嘴哥 李坤然 likunran li kunran java mysql 博客 jd李坤然 广告 dsp ssp 精准通" name="keywords">
+		<link rel="stylesheet" href="/css/main.css" />
+		<link rel="stylesheet" href="/css/pygments_native.css" />
+		<link rel="stylesheet" href="http://fonts.useso.com/css?family=Handlee">
+<link rel="Shortcut Icon" href="http://www.uyicu.com/favicon.ico" type="image/x-icon" />
+	</head>
+	<body>
+		<header id="header">
+			<div class="header-info fix">
+				<h1><a href="/">青头白菜</a></h1>
+				<p class="describe">&lt;嘴哥  /&gt;</p>
+				<nav class="navigation">
+					<ul>
+						<li><a href="/">首页</a></li>
+						<li><a href="/archive.html">列表</a></li>
+						<li><a href="/about">关于</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header><!--/header end-->
+		<section id="content" class="fix">
+			<article id="post">
+	<a href="#" class="icon-fullscreen r" title="点击全屏显示"></a>
+	<div class="c9">
+		分类：
+			
+			<a href="/category.html#kafka">kafka</a>
+			
+			
+		&emsp;&emsp;&emsp;&emsp;
+		标签：kafka
+		&emsp;&emsp;&emsp;&emsp;
+		<time date="2014-10-18 00:00:00 +0800">2014-10-18</time>
+	</div>
+
+	<h1>kafka单机部署</h1>
+
+<p>kafka是一种高吞吐量的分布式发布订阅消息系统,kafka是linkedin用于日志处理的分布式消息队列，linkedin的日志数据容量大，但对可靠性要求不高，其日志数据主要包括用户行为（登录、浏览、点击、分享、喜欢）以及系统运行日志（CPU、内存、磁盘、网络、系统及进程状态）</p>
+
+<p>官网：</p>
+
+<ul>
+<li><a href='http://kafka.apache.org/'>http://kafka.apache.org/</a></li>
+</ul>
+
+
+<h2>环境配置</h2>
+
+<p>jdk zookeeper 配置可参照 前面文章配置。
+<a href='/2014/09/18/how-to-step-storm-on-centos.html' >单机部署storm</a></p>
+
+<h2>kafka 安装</h2>
+
+<p>wget http://apache.fayea.com/apache-mirror/kafka/0.8.1.1/kafka_2.9.2-0.8.1.1.tgz
+tar -zxf kafka_2.9.2-0.8.1.1.tgz
+cd kafka_2.9.2-0.8.1.1/config/</p>
+
+<p>修改配置文件</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">broker.id=0
+port=9092
+host.name=10.37.129.3
+num.network.threads=2
+num.io.threads=8
+socket.send.buffer.bytes=1048576
+socket.request.max.bytes=104857600
+log.dirs=/tmp/kafka-logs
+num.partitions=2
+log.flush.interval.messages=10000
+log.flush.interval.ms=1000
+log.retention.hours=168
+log.retention.bytes=1073741824
+log.segment.bytes=536870912
+log.retention.check.interval.ms=60000
+log.cleaner.enable=false
+zookeeper.connect=10.37.129.3:2181 
+zookeeper.connection.timeout.ms=1000000</code></pre></div>
+
+
+<p>启动</p>
+
+<p>./kafka-server-start.sh /export/home/server/kafka_2.8.0-0.8.1.1/config/server.properties</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">[2014-10-28 23:57:56,694] INFO [Socket Server on Broker 0], Started (kafka.network.SocketServer)
+[2014-10-28 23:57:56,766] INFO Will not load MX4J, mx4j-tools.jar is not in the classpath (kafka.utils.Mx4jLoader$)
+[2014-10-28 23:57:56,788] INFO 0 successfully elected as leader (kafka.server.ZookeeperLeaderElector)
+[2014-10-28 23:57:56,918] INFO New leader is 0 (kafka.server.ZookeeperLeaderElector$LeaderChangeListener)
+[2014-10-28 23:57:56,920] INFO Registered broker 0 at path /brokers/ids/0 with address 10.37.129.3:9092. (kafka.utils.ZkUtils$)
+[2014-10-28 23:57:56,935] INFO [Kafka Server 0], started (kafka.server.KafkaServer)</code></pre></div>
+
+
+<h2>kafka 常用命令</h2>
+
+<p>新建一个TOPIC</p>
+
+<p>./kafka-topics.sh --create --topic kafkatopic --replication-factor 1 --partitions 1 --zookeeper localhost:2181</p>
+
+<p>发送消息至KAFKA</p>
+
+<p>./kafka-console-producer.sh --broker-list localhost:9092 --sync --topic kafkatopic</p>
+
+<p>另开一个终端，显示消息的消费</p>
+
+<p>./kafka-console-consumer.sh --zookeeper localhost:2181 --topic kafkatopic --from-beginning</p>
+
+<p> 查看kafka topics list
+ bin/kafka-topics.sh --list --zookeeper localhost:2181
+删除
+ bin/kafka-run-class.sh kafka.admin.DeleteTopicCommand -topic topic_001 --zookeeper localhost:2181</p>
+
+<h1>总结</h1>
+
+<p>网上到不符合自己流程。简单记录吧。</p>
+
+
+	<div class="eof">-EOF-</div>
+
+	<hr />
+	<div class="page fix">
+		
+		<span class="prev"><a href="/2014/10/13/java-array.html">←《二维数组中的查找》</a></span>
+		
+		
+	</div>
+	<hr />
+</article>
+
+<div class="ds-thread" data-thread-key="20140918" data-title="kafka单机部署" data-url="www.uyicu.com/2014/10/18/how-to-step-kafka-on-centos.html"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"likunran"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+
+<script src="/js/jquery-min.js"></script>
+<script src="/js/Fullscreen.js"></script>
+<script type="text/javascript">
+$(function() {
+	var global = window;
+
+	// =============== 全屏显示 ==================
+	(function() {
+		var icon = $( 'a.icon-fullscreen' ),
+			fs, fsCallback;
+		
+		fsCallback = function(isFullscreen) {
+				if (isFullscreen) {
+					icon.addClass('expand').attr('title', 'ESC 退出全屏');
+				}
+				else {
+					icon.removeClass('expand').attr('title', '点击全屏显示');
+				}
+			};
+			
+		fs = new Fullscreen({
+				element: $('#post'),
+				noSafari: true,
+				callback: fsCallback
+			});
+
+		if (fs.fullscreenEnabled) {
+			icon.on('click', function() {
+				fs.toggleFullscreen();
+				return false;
+			});
+		}
+		else {
+			icon.hide();
+		}
+	})();
+
+
+	// ============== 目录提取 ===============
+	(function() {
+		// 设置无目录时，不显示
+		if (!parseInt('', 10)) {
+			return;
+		}
+
+		var dom = $('<fieldset id="catalogue"><legend>目录</legend></fieldset>'),
+			count = 0;
+		
+		$('#post').find('h2,h3,h4,h5').each(function() {
+			var name = 'catalogue_' + count++;
+			dom.append('<div class="txt_' + this.tagName + '">' +
+				'<a href="#' + name + '">' +
+					this.innerHTML +
+				'</a></div>');
+			this.id = name;
+		});
+
+		dom.appendTo('body');
+	})();
+});
+</script>
+<script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/button.js#uuid=&amp;style=5&amp;fs=4&amp;bgcolor=Green&amp;pophcol=1"></script>
+
+
+		</section><!--/content end-->
+
+
+		<footer id="footer">
+			<p class="l">
+				&copy;2014 <a href="/">青头白菜</a>
+				&emsp;&emsp;&emsp;
+				<a href="mailto:likunran@gmail.com" target="_blank">Email me</a>
+				<span class="c9">|</span>
+				<a href="https://github.com/calefy/calefy.github.com" target="_blank">Fork me on GitHub</a>
+			</p>
+			<p class="r">Powered by <a href="https://github.com/mojombo/jekyll" target="_blank">Jekyll</a></p>
+			<p class="tac">
+				『书到用时方恨少』
+			</p>
+			<!--getclicky begin-->
+			<div class="c">
+			</div>
+			<!--getclicky end-->
+		</footer><!--/footer end-->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-54961311-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+	</body>
+</html>
