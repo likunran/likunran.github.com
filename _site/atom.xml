@@ -4,13 +4,143 @@
  <title></title>
  <link href="/atom.xml" rel="self"/>
  <link href=""/>
- <updated>2014-10-29T00:01:40+08:00</updated>
+ <updated>2014-12-16T23:25:38+08:00</updated>
  <id></id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>如何描述bug</title>
+   <link href="/2014/12/16/how-description-bug.html"/>
+   <updated>2014-12-16T00:00:00+08:00</updated>
+   <id>h/2014/12/16/how-description-bug</id>
+   <content type="html">&lt;h1&gt;如何描述bug&lt;/h1&gt;
+
+&lt;h2&gt;卖包子的故事&lt;/h2&gt;
+
+&lt;p&gt;上大学的时候食堂里包子挺好吃，有好多种馅儿的。又一次和才哥去食堂吃饭。他负责去买包子我占座位，等了好久他还没有回来我就去面食窗口找他。发现好多人围观 突然听到买包子阿姨问“你吃什么馅儿的”（不知道说的哪里的方言，反正不好听懂），才哥回答 “我买包子”。阿姨问“你吃什么馅儿的”，才哥又回答“我买包子”。阿姨急了问“你到底吃什么馅儿的”，才哥很大声的回答“我买包子”。我赶紧过去说要四个韭菜馅儿的。一场血案可能就这样被制止了。后来问才哥才明白，他一直以为阿姨在问他买什么。&lt;/p&gt;
+
+&lt;h2&gt;论卖包子和测试共同点&lt;/h2&gt;
+
+&lt;p&gt;很多时候有测试人员，跑过来说这个功能有bug,这个功能不行了。我说怎么不行了。他说一点就不行了。我说怎么不行了。他说就是不行。
+这个不就演变成包子阿姨和我才哥的故事了吗。&lt;/p&gt;
+
+&lt;h2&gt;Bug我该如何对待你&lt;/h2&gt;
+
+&lt;p&gt;我自己还是比较喜欢测试人员发现bug的。因为bug并不是代表我犯错了，相反我认为程序做的还不够好。但我比较讨厌的是糟糕的bug描述。泛泛而谈的标题，有的bug描述只有标题，错乱的步骤，夸大其词，杞人忧天，让人费解的方案。&lt;/br&gt;&lt;/p&gt;
+
+&lt;h2&gt;Bug分析&lt;/h2&gt;
+
+&lt;p&gt;＊标题 要简略&lt;/br&gt;
+＊指派 谁来处理这个问题&lt;/br&gt;
+＊重现步骤。问题再次出现相关步骤。&lt;/br&gt;
+＊优先级别。问题都紧迫性和重要性。&lt;/br&gt;
+＊严重程度。问题所产生的后果。&lt;/br&gt;
+＊解决方案&lt;/br&gt;&lt;/p&gt;
+
+&lt;h2&gt;bug记录&lt;/h2&gt;
+
+&lt;p&gt;1.标题要规范便于bug分类，后期bug查找。&lt;/br&gt;
+2.指派最好指派给一个团队，这样更容易跟踪和解决。&lt;/br&gt;
+3.重现步骤要详细而有简洁。开发人员更容易定位问题。&lt;/br&gt;
+4.优先级别。可以根据级别规定修复时间。&lt;/br&gt;
+5.严重程度。带来了那些影响。&lt;/br&gt;
+6.当问题关闭时要有相应当解决方案。后期出现可以直接参看。&lt;/br&gt;&lt;/p&gt;
+
+&lt;h1&gt;总结&lt;/h1&gt;
+
+&lt;p&gt;如果我们当bug报告易写易读。那样我们沟通成本解决问题的速度就会大大加快。出现问题并步可怕，可怕的是在最短时间内我们不能定位问题和解决问题。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>java 使用 protocolbuffer</title>
+   <link href="/2014/10/29/java-how-to-use-protocolbuffer.html"/>
+   <updated>2014-10-29T00:00:00+08:00</updated>
+   <id>h/2014/10/29/java-how-to-use-protocolbuffer</id>
+   <content type="html">&lt;h1&gt;java 使用 protocolbuffer&lt;/h1&gt;
+
+&lt;p&gt;protocolbuffer(以下简称PB)是google 的一种数据交换的格式，它独立于语言，独立于平台。google 提供了三种语言的实现：java、c++ 和 python，每一种实现都包含了相应语言的编译器以及库文件。由于它是一种二进制的格式，比使用 xml 进行数据交换快许多。可以把它用于分布式应用之间的数据通信或者异构环境下的数据交换。作为一种效率和兼容性都很优秀的二进制数据传输格式，可以用于诸如网络传输、配置文件、数据存储等诸多领域。&lt;/p&gt;
+
+&lt;p&gt;官网：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#39;http://kafka.apache.org/&#39;&gt;http://kafka.apache.org/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h2&gt;环境配置&lt;/h2&gt;
+
+&lt;p&gt;jdk zookeeper 配置可参照 前面文章配置。
+&lt;a href=&#39;/2014/09/18/how-to-step-storm-on-centos.html&#39; &gt;单机部署storm&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;kafka 安装&lt;/h2&gt;
+
+&lt;p&gt;wget http://apache.fayea.com/apache-mirror/kafka/0.8.1.1/kafka_2.9.2-0.8.1.1.tgz
+tar -zxf kafka_2.9.2-0.8.1.1.tgz
+cd kafka_2.9.2-0.8.1.1/config/&lt;/p&gt;
+
+&lt;p&gt;修改配置文件&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;broker.id=0
+port=9092
+host.name=10.37.129.3
+num.network.threads=2
+num.io.threads=8
+socket.send.buffer.bytes=1048576
+socket.request.max.bytes=104857600
+log.dirs=/tmp/kafka-logs
+num.partitions=2
+log.flush.interval.messages=10000
+log.flush.interval.ms=1000
+log.retention.hours=168
+log.retention.bytes=1073741824
+log.segment.bytes=536870912
+log.retention.check.interval.ms=60000
+log.cleaner.enable=false
+zookeeper.connect=10.37.129.3:2181 
+zookeeper.connection.timeout.ms=1000000&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;启动&lt;/p&gt;
+
+&lt;p&gt;./kafka-server-start.sh /export/home/server/kafka_2.8.0-0.8.1.1/config/server.properties&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;[2014-10-28 23:57:56,694] INFO [Socket Server on Broker 0], Started (kafka.network.SocketServer)
+[2014-10-28 23:57:56,766] INFO Will not load MX4J, mx4j-tools.jar is not in the classpath (kafka.utils.Mx4jLoader$)
+[2014-10-28 23:57:56,788] INFO 0 successfully elected as leader (kafka.server.ZookeeperLeaderElector)
+[2014-10-28 23:57:56,918] INFO New leader is 0 (kafka.server.ZookeeperLeaderElector$LeaderChangeListener)
+[2014-10-28 23:57:56,920] INFO Registered broker 0 at path /brokers/ids/0 with address 10.37.129.3:9092. (kafka.utils.ZkUtils$)
+[2014-10-28 23:57:56,935] INFO [Kafka Server 0], started (kafka.server.KafkaServer)&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;kafka 常用命令&lt;/h2&gt;
+
+&lt;p&gt;新建一个TOPIC&lt;/p&gt;
+
+&lt;p&gt;./kafka-topics.sh --create --topic kafkatopic --replication-factor 1 --partitions 1 --zookeeper localhost:2181&lt;/p&gt;
+
+&lt;p&gt;发送消息至KAFKA&lt;/p&gt;
+
+&lt;p&gt;./kafka-console-producer.sh --broker-list localhost:9092 --sync --topic kafkatopic&lt;/p&gt;
+
+&lt;p&gt;另开一个终端，显示消息的消费&lt;/p&gt;
+
+&lt;p&gt;./kafka-console-consumer.sh --zookeeper localhost:2181 --topic kafkatopic --from-beginning&lt;/p&gt;
+
+&lt;p&gt; 查看kafka topics list
+ bin/kafka-topics.sh --list --zookeeper localhost:2181
+删除
+ bin/kafka-run-class.sh kafka.admin.DeleteTopicCommand -topic topic_001 --zookeeper localhost:2181&lt;/p&gt;
+
+&lt;h1&gt;总结&lt;/h1&gt;
+
+&lt;p&gt;网上到不符合自己流程。简单记录吧。&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>kafka单机部署</title>

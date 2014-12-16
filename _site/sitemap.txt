@@ -13,6 +13,10 @@
 
 
 
+/2014/12/16/how-description-bug.html
+
+/2014/10/29/java-how-to-use-protocolbuffer.html
+
 /2014/10/18/how-to-step-kafka-on-centos.html
 
 /2014/10/13/java-array.html

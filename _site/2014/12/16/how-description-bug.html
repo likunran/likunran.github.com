@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		
-                 <title>kafka单机部署</title>
+                 <title>如何描述bug</title>
                  <meta content="嘴哥的博客" name="description">
                 <meta content="storm 青头白菜 嘴哥 李坤然 likunran li kunran java mysql 博客 jd李坤然 广告 dsp ssp 精准通" name="keywords">
 		<link rel="stylesheet" href="/css/main.css" />
@@ -31,93 +31,51 @@
 	<div class="c9">
 		分类：
 			
-			<a href="/category.html#kafka">kafka</a>
+			<a href="/category.html#测试">测试</a>
 			
 			
 		&emsp;&emsp;&emsp;&emsp;
-		标签：kafka
+		标签：测试
 		&emsp;&emsp;&emsp;&emsp;
-		<time date="2014-10-18 00:00:00 +0800">2014-10-18</time>
+		<time date="2014-12-16 00:00:00 +0800">2014-12-16</time>
 	</div>
 
-	<h1>kafka单机部署</h1>
+	<h1>如何描述bug</h1>
 
-<p>kafka是一种高吞吐量的分布式发布订阅消息系统,kafka是linkedin用于日志处理的分布式消息队列，linkedin的日志数据容量大，但对可靠性要求不高，其日志数据主要包括用户行为（登录、浏览、点击、分享、喜欢）以及系统运行日志（CPU、内存、磁盘、网络、系统及进程状态）</p>
+<h2>卖包子的故事</h2>
 
-<p>官网：</p>
+<p>上大学的时候食堂里包子挺好吃，有好多种馅儿的。又一次和才哥去食堂吃饭。他负责去买包子我占座位，等了好久他还没有回来我就去面食窗口找他。发现好多人围观 突然听到买包子阿姨问“你吃什么馅儿的”（不知道说的哪里的方言，反正不好听懂），才哥回答 “我买包子”。阿姨问“你吃什么馅儿的”，才哥又回答“我买包子”。阿姨急了问“你到底吃什么馅儿的”，才哥很大声的回答“我买包子”。我赶紧过去说要四个韭菜馅儿的。一场血案可能就这样被制止了。后来问才哥才明白，他一直以为阿姨在问他买什么。</p>
 
-<ul>
-<li><a href='http://kafka.apache.org/'>http://kafka.apache.org/</a></li>
-</ul>
+<h2>论卖包子和测试共同点</h2>
 
+<p>很多时候有测试人员，跑过来说这个功能有bug,这个功能不行了。我说怎么不行了。他说一点就不行了。我说怎么不行了。他说就是不行。
+这个不就演变成包子阿姨和我才哥的故事了吗。</p>
 
-<h2>环境配置</h2>
+<h2>Bug我该如何对待你</h2>
 
-<p>jdk zookeeper 配置可参照 前面文章配置。
-<a href='/2014/09/18/how-to-step-storm-on-centos.html' >单机部署storm</a></p>
+<p>我自己还是比较喜欢测试人员发现bug的。因为bug并不是代表我犯错了，相反我认为程序做的还不够好。但我比较讨厌的是糟糕的bug描述。泛泛而谈的标题，有的bug描述只有标题，错乱的步骤，夸大其词，杞人忧天，让人费解的方案。</br></p>
 
-<h2>kafka 安装</h2>
+<h2>Bug分析</h2>
 
-<p>wget http://apache.fayea.com/apache-mirror/kafka/0.8.1.1/kafka_2.9.2-0.8.1.1.tgz
-tar -zxf kafka_2.9.2-0.8.1.1.tgz
-cd kafka_2.9.2-0.8.1.1/config/</p>
+<p>＊标题 要简略</br>
+＊指派 谁来处理这个问题</br>
+＊重现步骤。问题再次出现相关步骤。</br>
+＊优先级别。问题都紧迫性和重要性。</br>
+＊严重程度。问题所产生的后果。</br>
+＊解决方案</br></p>
 
-<p>修改配置文件</p>
+<h2>bug记录</h2>
 
-<div class="highlight"><pre><code class="language-text" data-lang="text">broker.id=0
-port=9092
-host.name=10.37.129.3
-num.network.threads=2
-num.io.threads=8
-socket.send.buffer.bytes=1048576
-socket.request.max.bytes=104857600
-log.dirs=/tmp/kafka-logs
-num.partitions=2
-log.flush.interval.messages=10000
-log.flush.interval.ms=1000
-log.retention.hours=168
-log.retention.bytes=1073741824
-log.segment.bytes=536870912
-log.retention.check.interval.ms=60000
-log.cleaner.enable=false
-zookeeper.connect=10.37.129.3:2181 
-zookeeper.connection.timeout.ms=1000000</code></pre></div>
-
-
-<p>启动</p>
-
-<p>./kafka-server-start.sh /export/home/server/kafka_2.8.0-0.8.1.1/config/server.properties</p>
-
-<div class="highlight"><pre><code class="language-text" data-lang="text">[2014-10-28 23:57:56,694] INFO [Socket Server on Broker 0], Started (kafka.network.SocketServer)
-[2014-10-28 23:57:56,766] INFO Will not load MX4J, mx4j-tools.jar is not in the classpath (kafka.utils.Mx4jLoader$)
-[2014-10-28 23:57:56,788] INFO 0 successfully elected as leader (kafka.server.ZookeeperLeaderElector)
-[2014-10-28 23:57:56,918] INFO New leader is 0 (kafka.server.ZookeeperLeaderElector$LeaderChangeListener)
-[2014-10-28 23:57:56,920] INFO Registered broker 0 at path /brokers/ids/0 with address 10.37.129.3:9092. (kafka.utils.ZkUtils$)
-[2014-10-28 23:57:56,935] INFO [Kafka Server 0], started (kafka.server.KafkaServer)</code></pre></div>
-
-
-<h2>kafka 常用命令</h2>
-
-<p>新建一个TOPIC</p>
-
-<p>./kafka-topics.sh --create --topic kafkatopic --replication-factor 1 --partitions 1 --zookeeper localhost:2181</p>
-
-<p>发送消息至KAFKA</p>
-
-<p>./kafka-console-producer.sh --broker-list localhost:9092 --sync --topic kafkatopic</p>
-
-<p>另开一个终端，显示消息的消费</p>
-
-<p>./kafka-console-consumer.sh --zookeeper localhost:2181 --topic kafkatopic --from-beginning</p>
-
-<p> 查看kafka topics list
- bin/kafka-topics.sh --list --zookeeper localhost:2181
-删除
- bin/kafka-run-class.sh kafka.admin.DeleteTopicCommand -topic topic_001 --zookeeper localhost:2181</p>
+<p>1.标题要规范便于bug分类，后期bug查找。</br>
+2.指派最好指派给一个团队，这样更容易跟踪和解决。</br>
+3.重现步骤要详细而有简洁。开发人员更容易定位问题。</br>
+4.优先级别。可以根据级别规定修复时间。</br>
+5.严重程度。带来了那些影响。</br>
+6.当问题关闭时要有相应当解决方案。后期出现可以直接参看。</br></p>
 
 <h1>总结</h1>
 
-<p>网上到不符合自己流程。简单记录吧。</p>
+<p>如果我们当bug报告易写易读。那样我们沟通成本解决问题的速度就会大大加快。出现问题并步可怕，可怕的是在最短时间内我们不能定位问题和解决问题。</p>
 
 
 	<div class="eof">-EOF-</div>
@@ -125,16 +83,14 @@ zookeeper.connection.timeout.ms=1000000</code></pre></div>
 	<hr />
 	<div class="page fix">
 		
-		<span class="prev"><a href="/2014/10/13/java-array.html">←《二维数组中的查找》</a></span>
+		<span class="prev"><a href="/2014/10/29/java-how-to-use-protocolbuffer.html">←《java 使用 protocolbuffer》</a></span>
 		
-		
-		<span class="next"><a href="/2014/10/29/java-how-to-use-protocolbuffer.html">《java 使用 protocolbuffer》→</a></span>
 		
 	</div>
 	<hr />
 </article>
 
-<div class="ds-thread" data-thread-key="20140918" data-title="kafka单机部署" data-url="www.uyicu.com/2014/10/18/how-to-step-kafka-on-centos.html"></div>
+<div class="ds-thread" data-thread-key="20141216" data-title="如何描述bug" data-url="www.uyicu.com/2014/12/16/how-description-bug.html"></div>
 <script type="text/javascript">
 var duoshuoQuery = {short_name:"likunran"};
 	(function() {
